@@ -1,0 +1,22 @@
+model User {
+    id       String  @id @default(uuid())
+    name     String
+    email    String  @unique
+    password String?
+
+    google_id String? @unique
+
+    profile_url       String?
+    profile_public_id String?
+
+    is_verified Boolean @default(false)
+
+    provider    Providers  @default(CREDENTIALS)
+    role        Role       @default(USER)
+    user_status UserStatus @default(ACTIVE)
+
+    created_at DateTime @default(now())
+    updated_at DateTime @updatedAt
+
+    @@map("users")
+}

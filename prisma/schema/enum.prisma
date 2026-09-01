@@ -1,0 +1,14 @@
+enum Providers {
+    GOOGLE
+    CREDENTIALS
+}
+
+enum Role {
+    USER
+    ADMIN
+}
+
+enum UserStatus {
+    ACTIVE
+    BAN
+}
