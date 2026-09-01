@@ -1,4 +1,5 @@
 import { Router } from "express";
+import passport from "passport";
 import upload from "../../lib/multer";
 import validateRequest from "../../middlewares/validateRequest";
 import mergeMulterPayload from "../../utils/mergeMulterPayload";
@@ -20,5 +21,12 @@ router.post(
 	validateRequest(verifyOtpSchema),
 	AuthController.verifyEmail,
 );
+
+router.get(
+	"/google",
+	passport.authenticate("google", { scope: ["profile", "email"] }),
+);
+
+router.get("/google/callback", AuthController.googleCallback);
 
 export const AuthRoutes = router;

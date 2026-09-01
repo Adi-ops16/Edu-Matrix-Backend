@@ -2,6 +2,7 @@ import crypto from "node:crypto";
 import path from "node:path";
 import ejs from "ejs";
 import status from "http-status";
+import type { Role } from "../../../../generated/prisma/enums";
 import config from "../../config";
 import transporter from "../../lib/nodeMailer";
 import { prisma } from "../../lib/prisma";
@@ -20,6 +21,13 @@ const registerUser = async (payload: TRegisterPayload) => {
 	const isUserExists = await prisma.user.findUnique({
 		where: { email },
 	});
+
+	if (isUserExists && isUserExists.provider === "GOOGLE") {
+		throw new AppError(
+			status.CONFLICT,
+			"You have already signed in with google. please login with google or set a password to enable credential login",
+		);
+	}
 
 	if (isUserExists) {
 		throw new AppError(
@@ -146,4 +154,23 @@ const verifyEmail = async (payload: TVerifyOtpPayload) => {
 	};
 };
 
-export const AuthService = { registerUser, verifyEmail };
+const googleCallback = async (user: {
+	id: string;
+	email: string;
+	role: Role;
+}) => {
+	const jwtPayload = {
+		id: user.id,
+		email: user.email,
+		role: user.role,
+	};
+	const access_token = signToken(jwtPayload, config.jwt_access_secret);
+	const refresh_token = signToken(jwtPayload, config.jwt_refresh_secret);
+
+	return {
+		access_token,
+		refresh_token,
+	};
+};
+
+export const AuthService = { registerUser, verifyEmail, googleCallback };

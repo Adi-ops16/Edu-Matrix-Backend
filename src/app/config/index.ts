@@ -33,6 +33,7 @@ export default {
 	// Google/nodemailer credentials
 	email_sender: env.EMAIL_SENDER!,
 	google_client_id: env.GOOGLE_CLIENT_ID!,
+	google_client_cb_url: env.GOOGLE_CLIENT_CB_URL!,
 	google_client_secret: env.GOOGLE_CLIENT_SECRET!,
 	google_refresh_token: env.GOOGLE_REFRESH_TOKEN!,
 };

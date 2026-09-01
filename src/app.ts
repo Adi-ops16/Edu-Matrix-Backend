@@ -5,10 +5,12 @@ import express, {
 	type Request,
 	type Response,
 } from "express";
+import passport from "passport";
 import config from "./app/config";
 import errorHandler from "./app/middlewares/globalErrorHandler";
 import { notFound } from "./app/middlewares/notFound";
 import { AuthRoutes } from "./app/modules/auth/auth.route";
+import "./app/config/passport";
 
 const app: Application = express();
 
@@ -21,6 +23,7 @@ app.use(
 	}),
 );
 app.use(cookieParser());
+app.use(passport.initialize());
 
 app.use("/api/v1/auth", AuthRoutes);
 
