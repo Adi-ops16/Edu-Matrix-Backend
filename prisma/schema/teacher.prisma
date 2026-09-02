@@ -1,0 +1,13 @@
+model Teacher {
+    teacher_id     String @id
+    designation    String
+    degree         String
+    graduated_from String
+
+    user User @relation(fields: [teacher_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+    created_at DateTime @default(now())
+    updated_at DateTime @updatedAt
+
+    @@map("teachers")
+}

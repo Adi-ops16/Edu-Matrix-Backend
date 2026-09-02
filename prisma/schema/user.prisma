@@ -9,14 +9,22 @@ model User {
     profile_url       String?
     profile_public_id String?
 
-    is_verified Boolean @default(false)
-
+    role        Role?
     provider    Providers  @default(CREDENTIALS)
-    role        Role       @default(USER)
     user_status UserStatus @default(ACTIVE)
+
+    is_active   Boolean @default(true)
+    is_deleted  Boolean @default(false)
+    is_verified Boolean @default(false)
 
     created_at DateTime @default(now())
     updated_at DateTime @updatedAt
+
+    institution_id Int?
+    institution    Institution? @relation(fields: [institution_id], references: [id])
+
+    student Student?
+    teacher Teacher?
 
     @@map("users")
 }

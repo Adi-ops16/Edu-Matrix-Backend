@@ -4,11 +4,19 @@ enum Providers {
 }
 
 enum Role {
-    USER
-    ADMIN
+    SUPER_ADMIN
+    INSTITUTION_ADMIN
+    STUDENT
+    TEACHER
 }
 
 enum UserStatus {
     ACTIVE
     BAN
+}
+
+enum InstitutionStatus {
+    PENDING
+    APPROVED
+    REJECTED
 }

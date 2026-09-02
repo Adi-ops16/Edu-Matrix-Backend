@@ -1,0 +1,24 @@
+model Institution {
+    id               Int               @id @default(autoincrement())
+    name             String
+    code             String
+    description      String
+    established_year Int
+    website          String?
+    address          String
+    city             String            @db.VarChar(15)
+    contact_email    String
+    contact_number   String
+    status           InstitutionStatus @default(PENDING)
+
+    created_by  String
+    reviewed_by String?
+    created_at  DateTime @default(now())
+    updated_at  DateTime @updatedAt
+
+    user User[]
+
+    @@unique([name])
+    @@unique([contact_email])
+    @@map("institutions")
+}

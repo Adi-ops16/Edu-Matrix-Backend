@@ -2,8 +2,10 @@
 import path from "node:path";
 import process, { env } from "node:process";
 import dotenv from "dotenv";
+import type { SignOptions } from "jsonwebtoken";
 
 const envPath = path.join(process.cwd(), "/.env");
+
 dotenv.config({ path: envPath, quiet: true });
 
 export default {
@@ -15,9 +17,9 @@ export default {
 
 	// JWT credentials
 	jwt_access_secret: env.JWT_ACCESS_SECRET!,
-	jwt_access_time: env.JWT_ACCESS_TIME!,
+	jwt_access_time: env.JWT_ACCESS_TIME as SignOptions,
 	jwt_refresh_secret: env.JWT_REFRESH_SECRET!,
-	jwt_refresh_time: env.JWT_REFRESH_TIME!,
+	jwt_refresh_time: env.JWT_REFRESH_TIME as SignOptions,
 
 	// cloudinary credentials
 	cloudinary_cloud_name: env.CLOUDINARY_CLOUD_NAME!,
@@ -36,4 +38,9 @@ export default {
 	google_client_cb_url: env.GOOGLE_CLIENT_CB_URL!,
 	google_client_secret: env.GOOGLE_CLIENT_SECRET!,
 	google_refresh_token: env.GOOGLE_REFRESH_TOKEN!,
+
+	// super admin credentials
+	super_admin_name: env.SUPER_ADMIN_NAME!,
+	super_admin_email: env.SUPER_ADMIN_EMAIL!,
+	super_admin_password: env.SUPER_ADMIN_PASSWORD!,
 };

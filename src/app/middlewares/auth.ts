@@ -9,9 +9,7 @@ import { verifyToken } from "../utils/jwt";
 
 declare global {
 	namespace Express {
-		interface Request {
-			user?: RequestUser;
-		}
+		interface User extends RequestUser {}
 	}
 }
 
@@ -39,7 +37,6 @@ const auth = (...roles: Role[]) => {
 		const user = await prisma.user.findUnique({
 			where: {
 				id: decodedData.data.id,
-				role: decodedData.data.role,
 			},
 		});
 
@@ -54,11 +51,32 @@ const auth = (...roles: Role[]) => {
 			);
 		}
 
-		if (!roles.includes(user.role)) {
-			throw new AppError(status.UNAUTHORIZED, "You are unauthorized");
+		if (user.is_deleted) {
+			throw new AppError(status.NOT_FOUND, "No account found.");
 		}
 
-		req.user = decodedData.data;
+		if (!user.is_active) {
+			throw new AppError(status.BAD_REQUEST, "Your account is inactive.");
+		}
+
+		if (!user.is_verified) {
+			throw new AppError(
+				status.BAD_REQUEST,
+				"Your account is not verified. Please verify your account to access this resource.",
+			);
+		}
+
+		if (roles.length > 0) {
+			if (!user.role || !roles.includes(user.role)) {
+				throw new AppError(status.UNAUTHORIZED, "You are unauthorized");
+			}
+		}
+
+		req.user = {
+			id: user.id,
+			email: user.email,
+			role: user.role,
+		};
 		next();
 	});
 };

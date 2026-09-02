@@ -2,6 +2,7 @@ import app from "./app";
 import config from "./app/config";
 import { prisma } from "./app/lib/prisma";
 import redisClient from "./app/lib/redis";
+import { seedSuperAdmin } from "./app/utils/seed";
 
 const port = config.port;
 
@@ -19,6 +20,7 @@ const main = async () => {
 
 		// await transporter.verify();
 		// console.log("nodemailer working");
+		seedSuperAdmin();
 
 		app.listen(port, () => {
 			console.log(`Server is running on port: ${port}`);

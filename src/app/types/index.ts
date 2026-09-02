@@ -18,11 +18,11 @@ export interface IResponsePayload<T = unknown> {
 export interface IJwtPayload {
 	id: string;
 	email: string;
-	role: Role;
+	role: Role | null;
 }
 
 export interface RequestUser {
 	id: string;
 	email: string;
-	role: Role;
+	role: Role | null;
 }

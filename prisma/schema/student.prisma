@@ -1,0 +1,12 @@
+model Student {
+    student_id String @id
+    semester   Int
+    cgpa       Float
+
+    user User @relation(fields: [student_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+    created_at DateTime @default(now())
+    updated_at DateTime @updatedAt
+
+    @@map("students")
+}

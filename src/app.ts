@@ -11,6 +11,7 @@ import errorHandler from "./app/middlewares/globalErrorHandler";
 import { notFound } from "./app/middlewares/notFound";
 import { AuthRoutes } from "./app/modules/auth/auth.route";
 import "./app/config/passport";
+import { InstitutionRoutes } from "./app/modules/institution/institution.route";
 
 const app: Application = express();
 
@@ -26,6 +27,7 @@ app.use(cookieParser());
 app.use(passport.initialize());
 
 app.use("/api/v1/auth", AuthRoutes);
+app.use("/api/v1/institution", InstitutionRoutes);
 
 app.get("/", async (_: Request, res: Response) => {
 	res.status(200).json({

@@ -2,18 +2,22 @@ import crypto from "node:crypto";
 import path from "node:path";
 import ejs from "ejs";
 import status from "http-status";
-import type { Role } from "../../../../generated/prisma/enums";
 import config from "../../config";
 import transporter from "../../lib/nodeMailer";
 import { prisma } from "../../lib/prisma";
 import redisClient from "../../lib/redis";
 import type { IJwtPayload } from "../../types";
 import AppError from "../../utils/appError";
-import { hashPassword } from "../../utils/hashPassword";
+import { comparePassword, hashPassword } from "../../utils/hashPassword";
 import { signToken } from "../../utils/jwt.js";
 import uploadImage from "../../utils/uploadImage";
 import { verifyOtp } from "../../utils/verifyOtp";
-import type { TRegisterPayload, TVerifyOtpPayload } from "./auth.schema";
+import type { IUser } from "../user/user.interface";
+import type {
+	TLoginPayload,
+	TRegisterPayload,
+	TVerifyOtpPayload,
+} from "./auth.schema";
 
 const registerUser = async (payload: TRegisterPayload) => {
 	const { photo, email, name, password } = payload;
@@ -84,7 +88,7 @@ const registerUser = async (payload: TRegisterPayload) => {
 	transporter.sendMail({
 		from: config.email_sender,
 		to: email,
-		subject: "Your registration otp for assignment-6",
+		subject: "Your registration otp for Edu-Matrix",
 		html,
 	});
 };
@@ -154,11 +158,7 @@ const verifyEmail = async (payload: TVerifyOtpPayload) => {
 	};
 };
 
-const googleCallback = async (user: {
-	id: string;
-	email: string;
-	role: Role;
-}) => {
+const googleCallback = async (user: IUser) => {
 	const jwtPayload = {
 		id: user.id,
 		email: user.email,
@@ -173,4 +173,42 @@ const googleCallback = async (user: {
 	};
 };
 
-export const AuthService = { registerUser, verifyEmail, googleCallback };
+const login = async (payload: TLoginPayload) => {
+	const { email, password } = payload;
+
+	const user = await prisma.user.findUnique({
+		where: { email },
+	});
+
+	if (!user) {
+		throw new AppError(status.NOT_FOUND, "No user found, please register");
+	}
+
+	if (!user.password || user.google_id || user.provider === "GOOGLE") {
+		throw new AppError(
+			status.CONFLICT,
+			"You have signed in with google. please login with google or set a password to enable credential login",
+		);
+	}
+
+	const isPasswordValid = await comparePassword(password, user.password);
+
+	if (!isPasswordValid) {
+		throw new AppError(status.UNAUTHORIZED, "Invalid credentials");
+	}
+
+	const jwtPayload = {
+		id: user.id,
+		email: user.email,
+		role: user.role,
+	};
+	const access_token = signToken(jwtPayload, config.jwt_access_secret);
+	const refresh_token = signToken(jwtPayload, config.jwt_refresh_secret);
+
+	return {
+		access_token,
+		refresh_token,
+	};
+};
+
+export const AuthService = { registerUser, verifyEmail, googleCallback, login };
