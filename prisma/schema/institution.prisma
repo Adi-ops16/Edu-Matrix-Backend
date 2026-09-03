@@ -16,7 +16,8 @@ model Institution {
     created_at  DateTime @default(now())
     updated_at  DateTime @updatedAt
 
-    user User[]
+    users       User[]
+    departments Department[]
 
     @@unique([name])
     @@unique([contact_email])

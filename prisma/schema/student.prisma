@@ -1,7 +1,16 @@
 model Student {
     student_id String @id
-    semester   Int
-    cgpa       Float
+
+    // student_roll    String? @unique
+    // registration_no String? @unique
+    // admission_year  Int
+    semester Int   @default(1)
+    cgpa     Float @default(0)
+
+    // date_of_birth DateTime?
+    // gender        Gender?
+    // phone         String?
+    // address       String?
 
     user User @relation(fields: [student_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
 

@@ -5,7 +5,7 @@ import config from "../../config";
 import AppError from "../../utils/appError";
 import { catchAsync } from "../../utils/catchAsync";
 import sendResponse from "../../utils/sendResponse";
-import type { IUser } from "../user/user.interface";
+import type { IUser } from "../student/student.interface";
 import { AuthService } from "./auth.service";
 
 const registerUser = catchAsync(async (req, res, _) => {

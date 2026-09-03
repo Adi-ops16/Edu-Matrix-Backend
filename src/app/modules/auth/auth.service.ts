@@ -12,7 +12,7 @@ import { comparePassword, hashPassword } from "../../utils/hashPassword";
 import { signToken } from "../../utils/jwt.js";
 import uploadImage from "../../utils/uploadImage";
 import { verifyOtp } from "../../utils/verifyOtp";
-import type { IUser } from "../user/user.interface";
+import type { IUser } from "../student/student.interface";
 import type {
 	TLoginPayload,
 	TRegisterPayload,

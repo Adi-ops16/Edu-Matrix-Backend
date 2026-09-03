@@ -20,3 +20,10 @@ enum InstitutionStatus {
     APPROVED
     REJECTED
 }
+
+enum Gender {
+    MALE
+    FEMALE
+    KINDER
+    OTHER
+}
