@@ -1,5 +1,9 @@
 import z from "zod";
-import { InstitutionStatus } from "../../../../generated/prisma/enums";
+import {
+	InstitutionStatus,
+	MemberStatus,
+	Role,
+} from "../../../../generated/prisma/enums";
 
 export const createInstitutionSchema = z.object({
 	name: z
@@ -57,7 +61,23 @@ export const updatedInstitutionSchema = z.object({
 	),
 });
 
+export const applyForInstitutionSchema = z.object({
+	role: z.enum([Role.STUDENT, Role.TEACHER]),
+	institution_id: z
+		.number("Institution id must be a number")
+		.int("Institution id must be an integer"),
+});
+
+export const reviewApplicationSchema = z.object({
+	user_id: z.uuid("Invalid uuid"),
+	membership_status: z.enum([MemberStatus.APPROVED, MemberStatus.DECLINED]),
+});
+
 export type TCreateInstitutionPayload = z.infer<typeof createInstitutionSchema>;
 export type TUpdateInstitutionStatusPayload = z.infer<
 	typeof updatedInstitutionSchema
 >;
+export type TApplyForInstitutionPayload = z.infer<
+	typeof applyForInstitutionSchema
+>;
+export type TReviewApplicationPayload = z.infer<typeof reviewApplicationSchema>;

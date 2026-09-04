@@ -67,6 +67,12 @@ const auth = (...roles: Role[]) => {
 		}
 
 		if (roles.length > 0) {
+			if (user.member_status !== "APPROVED") {
+				throw new AppError(
+					status.FORBIDDEN,
+					"Your account is not approved. please contact support for more information",
+				);
+			}
 			if (!user.role || !roles.includes(user.role)) {
 				throw new AppError(status.UNAUTHORIZED, "You are unauthorized");
 			}

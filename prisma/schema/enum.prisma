@@ -33,3 +33,10 @@ enum JoiningStatus {
     APPROVED
     DECLINED
 }
+
+enum MemberStatus {
+    NOT_JOINED
+    PENDING
+    APPROVED
+    DECLINED
+}

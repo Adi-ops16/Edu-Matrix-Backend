@@ -19,6 +19,7 @@ const seedSuperAdmin = async () => {
 			is_verified: true,
 			role: "SUPER_ADMIN",
 			password: hashedPassword,
+			member_status: "APPROVED",
 		},
 	});
 

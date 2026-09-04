@@ -9,9 +9,10 @@ model User {
     profile_url       String?
     profile_public_id String?
 
-    role        Role?
-    provider    Providers  @default(CREDENTIALS)
-    user_status UserStatus @default(ACTIVE)
+    role          Role?
+    provider      Providers    @default(CREDENTIALS)
+    user_status   UserStatus   @default(ACTIVE)
+    member_status MemberStatus @default(NOT_JOINED)
 
     is_active   Boolean @default(true)
     is_deleted  Boolean @default(false)
