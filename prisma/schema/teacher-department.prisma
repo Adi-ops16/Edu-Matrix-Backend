@@ -4,6 +4,7 @@ model TeacherDepartment {
     teacher_id     String
     department_id  String
     joining_status JoiningStatus @default(PENDING)
+    reviewed_by    String?
 
     created_at DateTime @default(now())
     updated_at DateTime @updatedAt

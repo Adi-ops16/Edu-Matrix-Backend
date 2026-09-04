@@ -1,4 +1,5 @@
 import z from "zod";
+import { JoiningStatus, Role } from "../../../../generated/prisma/enums";
 
 export const createDepartmentSchema = z.object({
 	name: z.string("Name is required"),
@@ -31,5 +32,13 @@ export const deleteDepartmentSchema = z.object({
 
 export const joinDepartmentSchema = deleteDepartmentSchema;
 
+export const approveJoiningSchema = z.object({
+	department_id: z.uuid("Invalid uuid"),
+	user_id: z.uuid("Invalid uuid"),
+	role: z.enum([Role.STUDENT, Role.TEACHER], "Invalid role"),
+	status: z.enum([JoiningStatus.APPROVED, JoiningStatus.DECLINED]),
+});
+
 export type TCreateDepartmentPayload = z.infer<typeof createDepartmentSchema>;
 export type TUpdateDepartmentPayload = z.infer<typeof updateDepartmentSchema>;
+export type TApproveJoiningPayload = z.infer<typeof approveJoiningSchema>;

@@ -3,6 +3,7 @@ import auth from "../../middlewares/auth";
 import validateRequest from "../../middlewares/validateRequest";
 import { DepartmentController } from "./department.controller";
 import {
+	approveJoiningSchema,
 	createDepartmentSchema,
 	deleteDepartmentSchema,
 	joinDepartmentSchema,
@@ -14,7 +15,7 @@ const router = Router();
 router.get(
 	"/departments",
 	auth("INSTITUTION_ADMIN", "STUDENT", "TEACHER"),
-	DepartmentController.createDepartment,
+	DepartmentController.getInstitutionDepartments,
 );
 
 router.post(
@@ -43,6 +44,13 @@ router.post(
 	auth("STUDENT", "TEACHER"),
 	validateRequest(joinDepartmentSchema),
 	DepartmentController.joinDepartment,
+);
+
+router.patch(
+	"/review-request",
+	auth("INSTITUTION_ADMIN"),
+	validateRequest(approveJoiningSchema),
+	DepartmentController.approveJoining,
 );
 
 export const DepartmentRoutes = router;

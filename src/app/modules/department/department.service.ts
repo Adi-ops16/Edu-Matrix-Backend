@@ -3,6 +3,7 @@ import { prisma } from "../../lib/prisma";
 import AppError from "../../utils/appError";
 import { removeUndefined } from "../../utils/removeUndefined";
 import type {
+	TApproveJoiningPayload,
 	TCreateDepartmentPayload,
 	TUpdateDepartmentPayload,
 } from "./department.schema";
@@ -130,7 +131,7 @@ const joinDepartment = async (department_id: string, userId: string | null) => {
 		});
 
 		if (existingMembership) {
-			if (existingMembership.joining_status === "JOINED") {
+			if (existingMembership.joining_status === "APPROVED") {
 				throw new AppError(
 					status.CONFLICT,
 					"Student has already joined this department",
@@ -155,6 +156,9 @@ const joinDepartment = async (department_id: string, userId: string | null) => {
 				data: {
 					joining_status: "PENDING",
 				},
+				include: {
+					department: true,
+				},
 			});
 		}
 
@@ -162,6 +166,9 @@ const joinDepartment = async (department_id: string, userId: string | null) => {
 			data: {
 				student_id: userId,
 				department_id,
+			},
+			include: {
+				department: true,
 			},
 		});
 	}
@@ -177,7 +184,7 @@ const joinDepartment = async (department_id: string, userId: string | null) => {
 		});
 
 		if (existingMembership) {
-			if (existingMembership.joining_status === "JOINED") {
+			if (existingMembership.joining_status === "APPROVED") {
 				throw new AppError(
 					status.CONFLICT,
 					"Teacher has already joined this department",
@@ -201,6 +208,9 @@ const joinDepartment = async (department_id: string, userId: string | null) => {
 				data: {
 					joining_status: "PENDING",
 				},
+				include: {
+					department: true,
+				},
 			});
 		}
 
@@ -209,10 +219,84 @@ const joinDepartment = async (department_id: string, userId: string | null) => {
 				teacher_id: userId,
 				department_id,
 			},
+			include: {
+				department: true,
+			},
 		});
 	}
 
 	throw new AppError(status.BAD_REQUEST, "Invalid user role");
+};
+
+const approveJoining = async (
+	payload: TApproveJoiningPayload,
+	admin_user_id: string | null,
+) => {
+	if (!admin_user_id) {
+		throw new AppError(status.BAD_REQUEST, "Admin user id not provided");
+	}
+
+	const { department_id, role, status: joining_status, user_id } = payload;
+
+	if (role === "STUDENT") {
+		const isDepartmentExists = await prisma.studentDepartment.findFirst({
+			where: {
+				department_id,
+				student_id: user_id,
+				joining_status: "PENDING",
+			},
+			include: {
+				department: true,
+			},
+		});
+
+		if (!isDepartmentExists || isDepartmentExists.department.is_deleted) {
+			throw new AppError(status.NOT_FOUND, "Department not found");
+		}
+
+		return await prisma.studentDepartment.update({
+			where: {
+				student_id_department_id: {
+					department_id,
+					student_id: user_id,
+				},
+			},
+			data: {
+				joining_status,
+				reviewed_by: admin_user_id,
+			},
+		});
+	}
+
+	if (role === "TEACHER") {
+		const isDepartmentExists = await prisma.teacherDepartment.findFirst({
+			where: {
+				department_id,
+				teacher_id: user_id,
+				joining_status: "PENDING",
+			},
+			include: {
+				department: true,
+			},
+		});
+
+		if (!isDepartmentExists || isDepartmentExists.department?.is_deleted) {
+			throw new AppError(status.NOT_FOUND, "Department not found");
+		}
+
+		return await prisma.teacherDepartment.update({
+			where: {
+				teacher_id_department_id: {
+					department_id,
+					teacher_id: user_id,
+				},
+			},
+			data: {
+				joining_status,
+				reviewed_by: admin_user_id,
+			},
+		});
+	}
 };
 
 export const DepartmentService = {
@@ -221,4 +305,5 @@ export const DepartmentService = {
 	getInstitutionDepartments,
 	deleteDepartment,
 	joinDepartment,
+	approveJoining,
 };

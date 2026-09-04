@@ -34,20 +34,20 @@ const getInstitutionDepartments = catchAsync(async (req, res) => {
 		await DepartmentService.getInstitutionDepartments(institution_id);
 
 	sendResponse(res, {
-		message: "Department updated",
+		message: "Departments fetched successfully",
 		data: result,
 	});
 });
 
 const deleteDepartment = catchAsync(async (req, res) => {
-	const department_id: string = req.body;
-
+	const { department_id } = req.body;
 	await DepartmentService.deleteDepartment(department_id);
 
 	sendResponse(res, {
 		message: "Department deleted",
 	});
 });
+
 const joinDepartment = catchAsync(async (req, res) => {
 	const department_id: string = req.body;
 	const userId = req.user?.id ?? null;
@@ -55,7 +55,19 @@ const joinDepartment = catchAsync(async (req, res) => {
 	const result = await DepartmentService.joinDepartment(department_id, userId);
 
 	sendResponse(res, {
-		message: `Joined to ${result} department as a ${result}`,
+		message: `Joining request sent to ${result.department?.name} department`,
+		data: result,
+	});
+});
+
+const approveJoining = catchAsync(async (req, res) => {
+	const payload = req.body;
+	const adminUserId = req.user?.id ?? null;
+
+	const result = await DepartmentService.approveJoining(payload, adminUserId);
+
+	sendResponse(res, {
+		message: `Joining request ${result?.joining_status}`,
 		data: result,
 	});
 });
@@ -66,4 +78,5 @@ export const DepartmentController = {
 	getInstitutionDepartments,
 	deleteDepartment,
 	joinDepartment,
+	approveJoining,
 };
