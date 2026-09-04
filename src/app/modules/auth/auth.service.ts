@@ -146,6 +146,7 @@ const verifyEmail = async (payload: TVerifyOtpPayload) => {
 		id: user.id,
 		email: user.email,
 		role: user.role,
+		institution_id: user.institution_id,
 	};
 
 	const access_token = signToken(jwtPayload, config.jwt_access_secret);
@@ -163,6 +164,7 @@ const googleCallback = async (user: IUser) => {
 		id: user.id,
 		email: user.email,
 		role: user.role,
+		institution_id: user.institutionId,
 	};
 	const access_token = signToken(jwtPayload, config.jwt_access_secret);
 	const refresh_token = signToken(jwtPayload, config.jwt_refresh_secret);
@@ -201,6 +203,7 @@ const login = async (payload: TLoginPayload) => {
 		id: user.id,
 		email: user.email,
 		role: user.role,
+		institution_id: user.institution_id,
 	};
 	const access_token = signToken(jwtPayload, config.jwt_access_secret);
 	const refresh_token = signToken(jwtPayload, config.jwt_refresh_secret);

@@ -76,6 +76,7 @@ const auth = (...roles: Role[]) => {
 			id: user.id,
 			email: user.email,
 			role: user.role,
+			institution_id: user.institution_id,
 		};
 		next();
 	});

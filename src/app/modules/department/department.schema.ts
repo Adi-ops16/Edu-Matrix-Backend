@@ -11,4 +11,25 @@ export const createDepartmentSchema = z.object({
 		.int("year must be an integer"),
 });
 
+export const updateDepartmentSchema = z.object({
+	department_id: z.uuid("Invalid uuid"),
+	name: z.string("Name is required").optional(),
+	code: z
+		.string("code is required and must be a string")
+		.max(5, "code must be less than 5 characters")
+		.optional(),
+	d_description: z.string("Description is required").optional(),
+	d_established_year: z
+		.number("Year must be a number")
+		.int("year must be an integer")
+		.optional(),
+});
+
+export const deleteDepartmentSchema = z.object({
+	department_id: z.uuid("Invalid uuid"),
+});
+
+export const joinDepartmentSchema = deleteDepartmentSchema;
+
 export type TCreateDepartmentPayload = z.infer<typeof createDepartmentSchema>;
+export type TUpdateDepartmentPayload = z.infer<typeof updateDepartmentSchema>;

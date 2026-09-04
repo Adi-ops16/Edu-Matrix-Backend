@@ -19,10 +19,12 @@ export interface IJwtPayload {
 	id: string;
 	email: string;
 	role: Role | null;
+	institution_id: number | null;
 }
 
 export interface RequestUser {
 	id: string;
 	email: string;
 	role: Role | null;
+	institution_id: number | null;
 }

@@ -1,18 +1,17 @@
 model Student {
     student_id String @id
 
-    // student_roll    String? @unique
-    // registration_no String? @unique
-    // admission_year  Int
-    semester Int   @default(1)
-    cgpa     Float @default(0)
+    admission_year        Int?
+    graduation_year       Int?
+    date_of_birth         DateTime?
+    gender                Gender?
+    phone                 String?
+    address               String?
+    certificate           String?
+    certificate_public_id String?
 
-    // date_of_birth DateTime?
-    // gender        Gender?
-    // phone         String?
-    // address       String?
-
-    user User @relation(fields: [student_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+    user        User                @relation(fields: [student_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+    departments StudentDepartment[]
 
     created_at DateTime @default(now())
     updated_at DateTime @updatedAt

@@ -7,10 +7,15 @@ model Department {
     d_established_year Int
 
     institution_id Int
-    institution    Institution @relation(fields: [institution_id], references: [id])
+
+    is_deleted Boolean @default(false)
 
     created_at DateTime @default(now())
     updated_at DateTime @updatedAt
+
+    institution        Institution         @relation(fields: [institution_id], references: [id])
+    teacherDepartments TeacherDepartment[]
+    studentDepartments StudentDepartment[]
 
     @@unique([institution_id, code])
     @@unique([institution_id, name])

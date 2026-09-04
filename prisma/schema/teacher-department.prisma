@@ -1,0 +1,16 @@
+model TeacherDepartment {
+    id Int @id @default(autoincrement())
+
+    teacher_id     String
+    department_id  String
+    joining_status JoiningStatus @default(PENDING)
+
+    created_at DateTime @default(now())
+    updated_at DateTime @updatedAt
+
+    teacher    Teacher     @relation(fields: [teacher_id], references: [teacher_id], onUpdate: Cascade, onDelete: Cascade)
+    department Department? @relation(fields: [department_id], references: [id], onUpdate: Cascade, onDelete: Cascade)
+
+    @@unique([teacher_id, department_id])
+    @@map("teacher_departments")
+}
