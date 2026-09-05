@@ -1,0 +1,41 @@
+model Course {
+    id                String   @id @default(uuid())
+    title             String
+    code              String
+    description       String?
+    learning_outcomes String[]
+
+    department_id String
+    department    Department @relation(fields: [department_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+    course_details CourseDetails[]
+
+    created_at DateTime @default(now())
+    updated_at DateTime @updatedAt
+
+    @@unique([department_id, code])
+    @@map("courses")
+}
+
+model CourseDetails {
+    id        Int          @id @default(autoincrement())
+    semester  String
+    batch     String
+    startDate DateTime?
+    endDate   DateTime?
+    status    CourseStatus @default(UPCOMING)
+    price     Float        @default(0.0)
+
+    course_id String
+
+    course Course @relation(fields: [course_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+    teachers    CourseTeacher[]
+    enrollments StudentEnrollment[]
+    payments    Payment[]
+
+    created_at DateTime @default(now())
+    updated_at DateTime @updatedAt
+
+    @@map("course_details")
+}

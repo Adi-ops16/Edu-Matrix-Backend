@@ -16,6 +16,7 @@ model Department {
     institution        Institution         @relation(fields: [institution_id], references: [id])
     teacherDepartments TeacherDepartment[]
     studentDepartments StudentDepartment[]
+    courses            Course[]
 
     @@unique([institution_id, code])
     @@unique([institution_id, name])

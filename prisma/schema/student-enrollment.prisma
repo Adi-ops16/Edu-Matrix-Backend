@@ -1,0 +1,15 @@
+model StudentEnrollment {
+    id Int @id @default(autoincrement())
+
+    student_id        String
+    course_details_id Int
+
+    student        Student       @relation(fields: [student_id], references: [student_id], onDelete: Cascade, onUpdate: Cascade)
+    course_details CourseDetails @relation(fields: [course_details_id], references: [id])
+
+    created_at DateTime @default(now())
+    updated_at DateTime @updatedAt
+
+    @@unique([student_id, course_details_id])
+    @@map("student_enrollments")
+}

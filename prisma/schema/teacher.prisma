@@ -16,6 +16,7 @@ model Teacher {
 
     user        User                @relation(fields: [teacher_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
     departments TeacherDepartment[]
+    courses     CourseTeacher[]
 
     created_at DateTime @default(now())
     updated_at DateTime @updatedAt

@@ -1,0 +1,24 @@
+model Payment {
+    payment_id String        @id @default(uuid())
+    amount     Float
+    currency   String        @default("BDT")
+    status     PaymentStatus @default(PENDING)
+
+    payment_gateway  PaymentGateway @default(STRIPE)
+    transaction_id   String?        @unique
+    gateway_response Json?
+
+    institution_id Int
+    institution    Institution @relation(fields: [institution_id], references: [id], onDelete: Cascade)
+
+    student_id String
+    student    Student @relation(fields: [student_id], references: [student_id], onDelete: Cascade)
+
+    course_details_id Int
+    course_details    CourseDetails @relation(fields: [course_details_id], references: [id], onDelete: Cascade)
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@map("payments")
+}

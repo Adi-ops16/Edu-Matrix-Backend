@@ -1,0 +1,12 @@
+model CourseTeacher {
+    id Int @id @default(autoincrement())
+
+    teacher_id        String
+    course_details_id Int
+
+    teacher Teacher       @relation(fields: [teacher_id], references: [teacher_id], onUpdate: Cascade)
+    course  CourseDetails @relation(fields: [course_details_id], references: [id], onUpdate: Cascade, onDelete: Cascade)
+
+    @@unique([course_details_id, teacher_id])
+    @@map("course_teachers")
+}

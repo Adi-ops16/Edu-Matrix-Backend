@@ -18,6 +18,7 @@ model Institution {
 
     users       User[]
     departments Department[]
+    payments    Payment[]
 
     @@unique([name])
     @@unique([contact_email])
