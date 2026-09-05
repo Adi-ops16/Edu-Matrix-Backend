@@ -19,8 +19,8 @@ export const updateDepartmentSchema = z.object({
 		.string("code is required and must be a string")
 		.max(5, "code must be less than 5 characters")
 		.optional(),
-	d_description: z.string("Description is required").optional(),
-	d_established_year: z
+	department_description: z.string("Description is required").optional(),
+	department_established_year: z
 		.number("Year must be a number")
 		.int("year must be an integer")
 		.optional(),

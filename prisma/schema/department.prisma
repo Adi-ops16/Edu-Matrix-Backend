@@ -3,8 +3,8 @@ model Department {
     name String
     code String
 
-    d_description      String
-    d_established_year Int
+    department_description      String?
+    department_established_year Int?
 
     institution_id Int
 

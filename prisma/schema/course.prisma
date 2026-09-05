@@ -21,8 +21,8 @@ model CourseDetails {
     id        Int          @id @default(autoincrement())
     semester  String
     batch     String
-    startDate DateTime?
-    endDate   DateTime?
+    start_date DateTime?
+    end_date   DateTime?
     status    CourseStatus @default(UPCOMING)
     price     Float        @default(0.0)
 

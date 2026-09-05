@@ -17,8 +17,8 @@ model Payment {
     course_details_id Int
     course_details    CourseDetails @relation(fields: [course_details_id], references: [id], onDelete: Cascade)
 
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+    created_at DateTime @default(now())
+    updated_at DateTime @updatedAt
 
     @@map("payments")
 }

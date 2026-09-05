@@ -22,7 +22,7 @@ const updateTeacherProfile = async (
 		where: { teacher_id: user_id },
 		data: {
 			...refinedPayload,
-			certificate: certificateDetails?.secure_url ?? null,
+			certificate_url: certificateDetails?.secure_url ?? null,
 			certificate_public_id: certificateDetails?.public_id ?? null,
 		},
 	});
