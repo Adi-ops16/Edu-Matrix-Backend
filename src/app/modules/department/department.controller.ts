@@ -49,7 +49,7 @@ const deleteDepartment = catchAsync(async (req, res) => {
 });
 
 const joinDepartment = catchAsync(async (req, res) => {
-	const department_id: string = req.body;
+	const department_id: string = req.body.department_id;
 	const userId = req.user?.id ?? null;
 
 	const result = await DepartmentService.joinDepartment(department_id, userId);

@@ -14,6 +14,7 @@ import "./app/config/passport";
 import { DepartmentRoutes } from "./app/modules/department/department.route";
 import { InstitutionRoutes } from "./app/modules/institution/institution.route";
 import { StudentRoutes } from "./app/modules/student/student.route";
+import { TeacherRoutes } from "./app/modules/teacher/teacher.route";
 
 const app: Application = express();
 
@@ -30,6 +31,7 @@ app.use(passport.initialize());
 
 app.use("/api/v1/auth", AuthRoutes);
 app.use("/api/v1/student", StudentRoutes);
+app.use("/api/v1/teacher", TeacherRoutes);
 app.use("/api/v1/institution", InstitutionRoutes);
 app.use("/api/v1/department", DepartmentRoutes);
 

@@ -12,11 +12,11 @@ if (!port) {
 
 const main = async () => {
 	try {
-		await prisma.$connect();
-		console.log("Connected to database successfully");
+		// await prisma.$connect();
+		// console.log("Connected to database successfully");
 
-		await redisClient.connect();
-		console.log("Redis connected successfully");
+		// await redisClient.connect();
+		// console.log("Redis connected successfully");
 
 		// await transporter.verify();
 		// console.log("nodemailer working");
