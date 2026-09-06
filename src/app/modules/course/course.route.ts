@@ -3,6 +3,7 @@ import auth from "../../middlewares/auth";
 import validateRequest from "../../middlewares/validateRequest";
 import { CourseController } from "./course.controller";
 import {
+	assignTeacherSchema,
 	createCourseSchema,
 	createNewCourseDetails,
 	updateCourseDetailsSchema,
@@ -37,6 +38,13 @@ router.patch(
 	auth("INSTITUTION_ADMIN"),
 	validateRequest(updateCourseStatusSchema),
 	CourseController.updateCourseStatus,
+);
+
+router.patch(
+	"/assign-teacher",
+	auth("INSTITUTION_ADMIN"),
+	validateRequest(assignTeacherSchema),
+	CourseController.assignCourseTeacher,
 );
 
 export const CourseRoutes = router;

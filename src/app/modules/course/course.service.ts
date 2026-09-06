@@ -3,6 +3,7 @@ import { prisma } from "../../lib/prisma";
 import AppError from "../../utils/appError";
 import { removeUndefined } from "../../utils/removeUndefined";
 import type {
+	TAssignTeacherPayload,
 	TCreateCoursePayload,
 	TCreateNewCourseDetailsPayload,
 	TUpdateCourseDetailsPayload,
@@ -250,9 +251,77 @@ const updateCourseStatus = async (
 	return updatedCourseDetails;
 };
 
+const assignCourseTeacher = async (
+	payload: TAssignTeacherPayload,
+	admin: Express.User,
+) => {
+	if (!admin.institution_id) {
+		throw new AppError(
+			status.BAD_REQUEST,
+			"Admin is not associated with any institution",
+		);
+	}
+
+	const existingCourseDetails = await prisma.courseDetails.findFirst({
+		where: {
+			id: payload.course_details_id,
+			course: {
+				department: {
+					institution_id: admin.institution_id,
+				},
+			},
+		},
+	});
+
+	if (!existingCourseDetails) {
+		throw new AppError(status.NOT_FOUND, "Course details not found");
+	}
+
+	if (existingCourseDetails.status === "COMPLETED") {
+		throw new AppError(
+			status.NOT_FOUND,
+			"Cannot assign teacher into a completed course",
+		);
+	}
+
+	const teachers = await prisma.teacher.findMany({
+		where: {
+			teacher_id: {
+				in: payload.teacher_id,
+			},
+			user: {
+				institution_id: admin.institution_id,
+			},
+		},
+		select: {
+			teacher_id: true,
+		},
+	});
+
+	if (teachers.length !== payload.teacher_id.length) {
+		throw new AppError(
+			status.BAD_REQUEST,
+			"One or more teachers do not belong to this institution",
+		);
+	}
+
+	const teacherData = payload.teacher_id.map((id) => ({
+		course_details_id: payload.course_details_id,
+		teacher_id: id,
+	}));
+
+	const assignedTeacher = await prisma.courseTeacher.createMany({
+		data: teacherData,
+		skipDuplicates: true,
+	});
+
+	return assignedTeacher.count;
+};
+
 export const CourseService = {
 	createCourse,
 	updateCourseDetails,
 	createNewCourseDetails,
 	updateCourseStatus,
+	assignCourseTeacher,
 };

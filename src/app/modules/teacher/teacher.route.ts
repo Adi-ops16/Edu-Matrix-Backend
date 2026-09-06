@@ -17,4 +17,10 @@ router.patch(
 	TeacherController.updateTeacherProfile,
 );
 
+router.get(
+	"/",
+	auth("INSTITUTION_ADMIN"),
+	TeacherController.getInstitutionTeachers,
+);
+
 export const TeacherRoutes = router;

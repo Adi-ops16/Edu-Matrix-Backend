@@ -46,9 +46,26 @@ const updateCourseStatus = catchAsync(async (req, res) => {
 	});
 });
 
+const assignCourseTeacher = catchAsync(async (req, res) => {
+	const payload = req.body;
+	const admin = req.user as Express.User;
+	const result = await CourseService.assignCourseTeacher(payload, admin);
+
+	sendResponse(res, {
+		message:
+			result === 0
+				? "Teacher is already assigned to this course"
+				: "Teacher assigned to course successfully",
+		data: {
+			teacher_assigned: result,
+		},
+	});
+});
+
 export const CourseController = {
 	createCourse,
 	updateCourseDetails,
 	createNewCourseDetails,
 	updateCourseStatus,
+	assignCourseTeacher,
 };

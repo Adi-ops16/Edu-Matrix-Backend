@@ -79,7 +79,18 @@ export const updateCourseStatusSchema = z.object({
 	),
 });
 
+export const assignTeacherSchema = z.object({
+	course_details_id: z
+		.number("Course details id should be a number")
+		.int("Course details id must be an integer")
+		.min(1, "Course details id must be provided"),
+	teacher_id: z
+		.array(z.uuid("Invalid teacher ID"))
+		.min(1, "At least one teacher must be provided"),
+});
+
 export type TCreateCoursePayload = z.infer<typeof createCourseSchema>;
+export type TAssignTeacherPayload = z.infer<typeof assignTeacherSchema>;
 
 export type TUpdateCourseDetailsPayload = z.infer<
 	typeof updateCourseDetailsSchema
