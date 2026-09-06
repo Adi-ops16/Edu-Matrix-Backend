@@ -18,13 +18,14 @@ model Course {
 }
 
 model CourseDetails {
-    id        Int          @id @default(autoincrement())
-    semester  String
-    batch     String
+    id         Int          @id @default(autoincrement())
+    semester   String
+    batch      String
     start_date DateTime?
     end_date   DateTime?
-    status    CourseStatus @default(UPCOMING)
-    price     Float        @default(0.0)
+    status     CourseStatus @default(UPCOMING)
+    price      Decimal      @default(0) @db.Decimal(12, 2)
+    currency   String       @default("BDT") @db.Char(3)
 
     course_id String
 
