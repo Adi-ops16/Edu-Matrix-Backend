@@ -12,6 +12,12 @@ import {
 
 const router = Router();
 
+router.get(
+	"/courses/:departmentId",
+	auth("STUDENT", "TEACHER", "INSTITUTION_ADMIN"),
+	CourseController.getCourses,
+);
+
 router.post(
 	"/create",
 	auth("INSTITUTION_ADMIN"),

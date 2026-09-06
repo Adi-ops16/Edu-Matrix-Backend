@@ -318,10 +318,50 @@ const assignCourseTeacher = async (
 	return assignedTeacher.count;
 };
 
+const getCourses = async (department_id: string | null, user: Express.User) => {
+	if (!user.institution_id) {
+		throw new AppError(
+			status.BAD_REQUEST,
+			"User is not associated with any institution",
+		);
+	}
+
+	if (!department_id) {
+		throw new AppError(status.BAD_REQUEST, "Department id is not provided");
+	}
+
+	const courses = await prisma.course.findMany({
+		where: {
+			department: {
+				id: department_id,
+				institution_id: user.institution_id,
+			},
+		},
+		include: {
+			course_details: {
+				where: {
+					status: "ONGOING",
+				},
+				omit: {
+					created_at: true,
+					updated_at: true,
+				},
+			},
+		},
+		omit: {
+			created_at: true,
+			updated_at: true,
+		},
+	});
+
+	return courses;
+};
+
 export const CourseService = {
 	createCourse,
 	updateCourseDetails,
 	createNewCourseDetails,
 	updateCourseStatus,
 	assignCourseTeacher,
+	getCourses,
 };

@@ -67,7 +67,7 @@ const approveJoining = catchAsync(async (req, res) => {
 	const result = await DepartmentService.approveJoining(payload, adminUserId);
 
 	sendResponse(res, {
-		message: `Joining request ${result?.joining_status}`,
+		message: `Joining request ${result?.joining_status.toLowerCase()}`,
 		data: result,
 	});
 });
