@@ -2,7 +2,7 @@ import { defineConfig } from "tsup";
 
 export default defineConfig({
 	entry: ["src/server.ts"],
-	format: ["esm", "cjs"],
+	format: ["cjs"],
 	target: "esnext",
 	outDir: "dist",
 	clean: true,
