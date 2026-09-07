@@ -43,4 +43,8 @@ export default {
 	super_admin_name: env.SUPER_ADMIN_NAME!,
 	super_admin_email: env.SUPER_ADMIN_EMAIL!,
 	super_admin_password: env.SUPER_ADMIN_PASSWORD!,
+
+	// stripe
+	stripe_secret_key: env.STRIPE_SECRET_KEY,
+	stripe_webhook_secret: env.STRIPE_WEBHOOK_SECRET!,
 };

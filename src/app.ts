@@ -14,10 +14,13 @@ import "./app/config/passport";
 import { CourseRoutes } from "./app/modules/course/course.route";
 import { DepartmentRoutes } from "./app/modules/department/department.route";
 import { InstitutionRoutes } from "./app/modules/institution/institution.route";
+import { PaymentRoutes } from "./app/modules/payment/payment.route";
 import { StudentRoutes } from "./app/modules/student/student.route";
 import { TeacherRoutes } from "./app/modules/teacher/teacher.route";
 
 const app: Application = express();
+
+app.use("/api/v1/payment/webhook", express.raw({ type: "application/json" }));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -36,6 +39,7 @@ app.use("/api/v1/teacher", TeacherRoutes);
 app.use("/api/v1/institution", InstitutionRoutes);
 app.use("/api/v1/department", DepartmentRoutes);
 app.use("/api/v1/course", CourseRoutes);
+app.use("/api/v1/payment", PaymentRoutes);
 
 app.get("/", async (_: Request, res: Response) => {
 	res.status(200).json({
