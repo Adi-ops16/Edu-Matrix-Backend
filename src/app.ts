@@ -11,6 +11,7 @@ import errorHandler from "./app/middlewares/globalErrorHandler";
 import { notFound } from "./app/middlewares/notFound";
 import { AuthRoutes } from "./app/modules/auth/auth.route";
 import "./app/config/passport";
+import { AdminRoutes } from "./app/modules/admin/admin.route";
 import { CourseRoutes } from "./app/modules/course/course.route";
 import { DepartmentRoutes } from "./app/modules/department/department.route";
 import { InstitutionRoutes } from "./app/modules/institution/institution.route";
@@ -40,6 +41,7 @@ app.use("/api/v1/institution", InstitutionRoutes);
 app.use("/api/v1/department", DepartmentRoutes);
 app.use("/api/v1/course", CourseRoutes);
 app.use("/api/v1/payment", PaymentRoutes);
+app.use("/api/v1/admin", AdminRoutes);
 
 app.get("/", async (_: Request, res: Response) => {
 	res.status(200).json({
