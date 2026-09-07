@@ -18,6 +18,7 @@ import { InstitutionRoutes } from "./app/modules/institution/institution.route";
 import { PaymentRoutes } from "./app/modules/payment/payment.route";
 import { StudentRoutes } from "./app/modules/student/student.route";
 import { TeacherRoutes } from "./app/modules/teacher/teacher.route";
+import { UserRoutes } from "./app/modules/user/user.route";
 
 const app: Application = express();
 
@@ -36,6 +37,7 @@ app.use(cookieParser());
 app.use(passport.initialize());
 
 app.use("/api/v1/auth", AuthRoutes);
+app.use("/api/v1/user", UserRoutes);
 app.use("/api/v1/student", StudentRoutes);
 app.use("/api/v1/teacher", TeacherRoutes);
 app.use("/api/v1/institution", InstitutionRoutes);
