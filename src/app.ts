@@ -21,16 +21,17 @@ import { TeacherRoutes } from "./app/modules/teacher/teacher.route";
 
 const app: Application = express();
 
-app.use("/api/v1/payment/webhook", express.raw({ type: "application/json" }));
-
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
 app.use(
 	cors({
 		origin: config.frontend_url,
 		credentials: true,
 	}),
 );
+
+app.use("/api/v1/payment/webhook", express.raw({ type: "application/json" }));
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(passport.initialize());
 

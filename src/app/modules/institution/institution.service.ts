@@ -27,6 +27,16 @@ const createInstitution = async (
 	return institution;
 };
 
+const getInstitutionApplications = async () => {
+	const applications = await prisma.institution.findMany({
+		where: {
+			status: "PENDING",
+		},
+	});
+
+	return applications;
+};
+
 const updateInstitutionStatus = async (
 	payload: TUpdateInstitutionStatusPayload,
 	user: RequestUser,
@@ -231,6 +241,7 @@ const reviewApplication = async (
 
 export const InstitutionService = {
 	createInstitution,
+	getInstitutionApplications,
 	updateInstitutionStatus,
 	applyForInstitution,
 	getPendingApplications,

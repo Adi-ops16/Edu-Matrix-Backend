@@ -15,6 +15,15 @@ const createInstitution = catchAsync(async (req, res) => {
 	});
 });
 
+const getInstitutionApplications = catchAsync(async (_req, res) => {
+	const result = await InstitutionService.getInstitutionApplications();
+
+	sendResponse(res, {
+		message: "Retrieved institution applications",
+		data: result,
+	});
+});
+
 const updateInstitutionStatus = catchAsync(async (req, res) => {
 	const payload = req.body;
 	const user = req.user as RequestUser;
@@ -65,6 +74,7 @@ const reviewApplication = catchAsync(async (req, res) => {
 
 export const InstitutionController = {
 	createInstitution,
+	getInstitutionApplications,
 	updateInstitutionStatus,
 	applyForInstitution,
 	getPendingApplications,

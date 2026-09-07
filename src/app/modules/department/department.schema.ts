@@ -6,8 +6,8 @@ export const createDepartmentSchema = z.object({
 	code: z
 		.string("code is required and must be a string")
 		.max(5, "code must be less than 5 characters"),
-	d_description: z.string("Description is required"),
-	d_established_year: z
+	department_description: z.string("Description is required"),
+	department_established_year: z
 		.number("Year must be a number")
 		.int("year must be an integer"),
 });

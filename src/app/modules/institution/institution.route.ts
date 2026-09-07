@@ -18,28 +18,34 @@ router.post(
 	InstitutionController.createInstitution,
 );
 
+router.get(
+	"/institution-applications",
+	auth("SUPER_ADMIN"),
+	InstitutionController.getInstitutionApplications,
+);
+
 router.patch(
-	"/review",
+	"/institution-application-review",
 	auth("SUPER_ADMIN"),
 	validateRequest(updatedInstitutionSchema),
 	InstitutionController.updateInstitutionStatus,
 );
 
 router.post(
-	"/apply",
+	"/apply-for-institution",
 	auth(),
 	validateRequest(applyForInstitutionSchema),
 	InstitutionController.applyForInstitution,
 );
 
 router.get(
-	"/applications",
+	"/joining-applications",
 	auth("INSTITUTION_ADMIN"),
 	InstitutionController.getPendingApplications,
 );
 
 router.patch(
-	"/application-review",
+	"/joining-application-review",
 	auth("INSTITUTION_ADMIN"),
 	validateRequest(reviewApplicationSchema),
 	InstitutionController.reviewApplication,
