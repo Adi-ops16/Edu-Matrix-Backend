@@ -1,3 +1,4 @@
+import type { Role } from "../../../../generated/prisma/enums";
 import { catchAsync } from "../../utils/catchAsync";
 import sendResponse from "../../utils/sendResponse";
 import { UserService } from "./user.service";
@@ -14,4 +15,16 @@ const changePfP = catchAsync(async (req, res) => {
 	});
 });
 
-export const UserController = { changePfP };
+const getMyProfile = catchAsync(async (req, res) => {
+	const userId = req.user?.id as string;
+	const role = req.user?.role as Role;
+
+	const result = await UserService.getMyProfile(userId, role);
+
+	sendResponse(res, {
+		message: "Profile data fetched Successfully",
+		data: result,
+	});
+});
+
+export const UserController = { changePfP, getMyProfile };

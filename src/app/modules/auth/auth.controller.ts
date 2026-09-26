@@ -22,15 +22,15 @@ const verifyEmail = catchAsync(async (req, res) => {
 
 	res.cookie("access_token", result.access_token, {
 		httpOnly: true,
-		sameSite: "lax",
-		secure: false,
+		secure: config.environment !== "development",
+		sameSite: config.environment === "development" ? "lax" : "none",
 		maxAge: 1000 * 60 * 60 * 24,
 	});
 
 	res.cookie("refresh_token", result.refresh_token, {
 		httpOnly: true,
-		sameSite: "lax",
-		secure: false,
+		secure: config.environment !== "development",
+		sameSite: config.environment === "development" ? "lax" : "none",
 		maxAge: 1000 * 60 * 60 * 24 * 7,
 	});
 
@@ -87,15 +87,15 @@ const login = catchAsync(async (req, res) => {
 
 	res.cookie("access_token", result.access_token, {
 		httpOnly: true,
-		sameSite: "lax",
-		secure: false,
+		secure: config.environment !== "development",
+		sameSite: config.environment === "development" ? "lax" : "none",
 		maxAge: 1000 * 60 * 60 * 24,
 	});
 
 	res.cookie("refresh_token", result.refresh_token, {
 		httpOnly: true,
-		sameSite: "lax",
-		secure: false,
+		secure: config.environment !== "development",
+		sameSite: config.environment === "development" ? "lax" : "none",
 		maxAge: 1000 * 60 * 60 * 24 * 7,
 	});
 
@@ -105,9 +105,19 @@ const login = catchAsync(async (req, res) => {
 	});
 });
 
+export const logout = catchAsync(async (_req, res) => {
+	res.clearCookie("access_token");
+	res.clearCookie("refresh_token");
+
+	sendResponse(res, {
+		message: "Logout successful",
+	});
+});
+
 export const AuthController = {
 	registerUser,
 	verifyEmail,
 	googleCallback,
 	login,
+	logout,
 };

@@ -1,6 +1,7 @@
 import { Router } from "express";
 import passport from "passport";
 import upload from "../../lib/multer";
+import auth from "../../middlewares/auth";
 import validateRequest from "../../middlewares/validateRequest";
 import mergeMulterPayload from "../../utils/mergeMulterPayload";
 import { AuthController } from "./auth.controller";
@@ -30,5 +31,7 @@ router.get(
 router.post("/login", validateRequest(loginSchema), AuthController.login);
 
 router.get("/google/callback", AuthController.googleCallback);
+
+router.post("/logout", auth(), AuthController.logout);
 
 export const AuthRoutes = router;
