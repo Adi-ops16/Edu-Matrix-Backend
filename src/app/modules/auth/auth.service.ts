@@ -211,6 +211,7 @@ const login = async (payload: TLoginPayload) => {
 	return {
 		access_token,
 		refresh_token,
+		role: user.role,
 	};
 };
 

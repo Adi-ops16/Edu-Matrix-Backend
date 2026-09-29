@@ -4,6 +4,7 @@ import type { TMulterFile } from "../lib/multer";
 const mergeMulterPayload = (...fields: string[]) => {
 	return async (req: Request, res: Response, next: NextFunction) => {
 		// parse the data from body.data
+		
 		if (req.body.data) {
 			try {
 				const parsedData = JSON.parse(req.body.data);

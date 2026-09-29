@@ -74,7 +74,9 @@ const googleCallback = (req: Request, res: Response, next: NextFunction) => {
 					maxAge: 7 * 24 * 60 * 60 * 1000,
 				});
 
-				return res.redirect(`${config.frontend_url}/auth/success`);
+				return res.redirect(
+					`${config.frontend_url}/oauth-progress?role=${user.role?.toLowerCase() ?? null}`,
+				);
 			} catch (error) {
 				return next(error);
 			}
