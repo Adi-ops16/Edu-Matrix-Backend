@@ -4,6 +4,24 @@ import { cloudinary } from "../../lib/cloudinary";
 import { prisma } from "../../lib/prisma";
 import AppError from "../../utils/appError";
 import uploadImage from "../../utils/uploadImage";
+import type { TUpdateUserProfilePayload } from "./user.schema";
+
+const updateUserProfile = async (
+	user: Express.User,
+	payload: TUpdateUserProfilePayload,
+) => {
+	const { name } = payload;
+	const result = await prisma.user.update({
+		where: { id: user.id },
+		data: {
+			...(name ? { name } : {}),
+		},
+		omit: {
+			password: true,
+		},
+	});
+	return result;
+};
 
 const changePfP = async (picture: Express.Multer.File, user: Express.User) => {
 	const existingUser = await prisma.user.findUnique({
@@ -40,8 +58,21 @@ const getMyProfile = async (userId: string, role: Role) => {
 	const userProfile = await prisma.user.findUnique({
 		where: { id: userId },
 		include: {
+			institution: {
+				omit: {
+					id: true,
+					reviewed_by: true,
+					created_by: true,
+					created_at: true,
+					updated_at: true,
+					status: true,
+				},
+			},
 			teacher: role === "TEACHER",
 			student: role === "STUDENT",
+		},
+		omit: {
+			password: true,
 		},
 	});
 
@@ -52,4 +83,4 @@ const getMyProfile = async (userId: string, role: Role) => {
 	return userProfile;
 };
 
-export const UserService = { changePfP, getMyProfile };
+export const UserService = { changePfP, getMyProfile, updateUserProfile };

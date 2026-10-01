@@ -18,6 +18,8 @@ router.post(
 	InstitutionController.createInstitution,
 );
 
+router.get("/institutions", auth(), InstitutionController.getInstitutions);
+
 router.get(
 	"/institution-applications",
 	auth("SUPER_ADMIN"),

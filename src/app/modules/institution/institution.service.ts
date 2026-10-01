@@ -27,6 +27,15 @@ const createInstitution = async (
 	return institution;
 };
 
+const getInstitutions = async () => {
+	const institutions = await prisma.institution.findMany({
+		where: {
+			status: "APPROVED",
+		},
+	});
+	return institutions;
+};
+
 const getInstitutionApplications = async () => {
 	const applications = await prisma.institution.findMany({
 		where: {
@@ -241,6 +250,7 @@ const reviewApplication = async (
 
 export const InstitutionService = {
 	createInstitution,
+	getInstitutions,
 	getInstitutionApplications,
 	updateInstitutionStatus,
 	applyForInstitution,

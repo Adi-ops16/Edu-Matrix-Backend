@@ -15,6 +15,18 @@ const changePfP = catchAsync(async (req, res) => {
 	});
 });
 
+const updateUserProfile = catchAsync(async (req, res) => {
+	const payload = req.body;
+	const user = req.user as Express.User;
+
+	const result = await UserService.updateUserProfile(user, payload);
+
+	sendResponse(res, {
+		message: "Profile updated Successfully",
+		data: result,
+	});
+});
+
 const getMyProfile = catchAsync(async (req, res) => {
 	const userId = req.user?.id as string;
 	const role = req.user?.role as Role;
@@ -27,4 +39,4 @@ const getMyProfile = catchAsync(async (req, res) => {
 	});
 });
 
-export const UserController = { changePfP, getMyProfile };
+export const UserController = { changePfP, getMyProfile, updateUserProfile };

@@ -5,11 +5,9 @@ import { UserController } from "./user.controller";
 
 const router = Router();
 
-router.get(
-	"/profile",
-	auth("TEACHER", "INSTITUTION_ADMIN", "SUPER_ADMIN", "STUDENT"),
-	UserController.getMyProfile,
-);
+router.get("/profile", auth(), UserController.getMyProfile);
+
+router.patch("/profile", auth(), UserController.updateUserProfile);
 
 router.patch(
 	"/update-profile-picture",
