@@ -1,5 +1,6 @@
 import status from "http-status";
 import { prisma } from "../../lib/prisma";
+import type { IQuery } from "../../types";
 import AppError from "../../utils/appError";
 import { removeUndefined } from "../../utils/removeUndefined";
 import type {
@@ -318,7 +319,11 @@ const assignCourseTeacher = async (
 	return assignedTeacher.count;
 };
 
-const getCourses = async (department_id: string | null, user: Express.User) => {
+const getCourses = async (
+	department_id: string | null,
+	user: Express.User,
+	_query: IQuery,
+) => {
 	if (!user.institution_id) {
 		throw new AppError(
 			status.BAD_REQUEST,

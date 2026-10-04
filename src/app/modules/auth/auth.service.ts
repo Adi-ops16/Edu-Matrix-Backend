@@ -186,14 +186,17 @@ const login = async (payload: TLoginPayload) => {
 		throw new AppError(status.NOT_FOUND, "No user found, please register");
 	}
 
-	if (!user.password || user.google_id || user.provider === "GOOGLE") {
+	if (!user.password && user.provider === "GOOGLE") {
 		throw new AppError(
 			status.CONFLICT,
 			"You have signed in with google. please login with google or set a password to enable credential login",
 		);
 	}
 
-	const isPasswordValid = await comparePassword(password, user.password);
+	const isPasswordValid = await comparePassword(
+		password,
+		user.password as string,
+	);
 
 	if (!isPasswordValid) {
 		throw new AppError(status.UNAUTHORIZED, "Invalid credentials");

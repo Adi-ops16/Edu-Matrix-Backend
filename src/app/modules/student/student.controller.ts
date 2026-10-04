@@ -14,4 +14,6 @@ const updateStudentProfile = catchAsync(async (req, res) => {
 	});
 });
 
-export const StudentController = { updateStudentProfile };
+export const StudentController = {
+	updateStudentProfile,
+};

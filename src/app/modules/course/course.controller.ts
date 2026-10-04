@@ -65,7 +65,8 @@ const assignCourseTeacher = catchAsync(async (req, res) => {
 const getCourses = catchAsync(async (req, res) => {
 	const user = req.user as Express.User;
 	const department_id = req.params.departmentId as string | null;
-	const result = await CourseService.getCourses(department_id, user);
+	const query = req.query;
+	const result = await CourseService.getCourses(department_id, user, query);
 
 	sendResponse(res, {
 		message: "Courses data retrieved",

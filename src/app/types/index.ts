@@ -28,3 +28,14 @@ export interface RequestUser {
 	role: Role | null;
 	institution_id: number | null;
 }
+
+export interface IQuery {
+	searchTerm?: string;
+	page?: string;
+	limit?: string;
+	sortOrder?: string;
+	sortBy?: string;
+
+	// biome-ignore lint/suspicious/noExplicitAny: <flexible query params>
+	[key: string]: any;
+}
