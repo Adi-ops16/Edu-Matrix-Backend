@@ -18,6 +18,18 @@ router.get(
 	CourseController.getCourses,
 );
 
+router.get(
+	"/admin/details/:courseId",
+	auth("INSTITUTION_ADMIN"),
+	CourseController.getAdminCourseDetails,
+);
+
+router.get(
+	"/details/:courseId",
+	auth("STUDENT"),
+	CourseController.getCourseDetails,
+);
+
 router.post(
 	"/create",
 	auth("INSTITUTION_ADMIN"),

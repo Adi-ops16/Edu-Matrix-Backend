@@ -1,4 +1,5 @@
 import status from "http-status";
+import type { Role } from "../../../../generated/prisma/enums";
 import { prisma } from "../../lib/prisma";
 import AppError from "../../utils/appError";
 import { removeUndefined } from "../../utils/removeUndefined";
@@ -64,8 +65,12 @@ const updateDepartment = async (payload: TUpdateDepartmentPayload) => {
 	return updatedDepartment;
 };
 
-const getInstitutionDepartments = async (institution_id: number | null) => {
-	if (!institution_id) {
+const getInstitutionDepartments = async (
+	institution_id: number | null,
+	user_id: string,
+	role: Role | null,
+) => {
+	if (!institution_id || !role) {
 		throw new AppError(
 			status.BAD_REQUEST,
 			"User doesn't belong to any institution",
@@ -76,7 +81,38 @@ const getInstitutionDepartments = async (institution_id: number | null) => {
 		where: { institution_id, is_deleted: false },
 	});
 
-	return departments;
+	if (role === "STUDENT") {
+		const myDepartmentsIds = await prisma.studentDepartment.findMany({
+			where: {
+				student_id: user_id,
+			},
+			select: {
+				department_id: true,
+			},
+		});
+
+		return {
+			departments,
+			myDepartmentsIds: myDepartmentsIds.map((d) => d.department_id),
+		};
+	}
+
+	if (role === "TEACHER") {
+		const myDepartmentsIds = await prisma.teacherDepartment.findMany({
+			where: {
+				teacher_id: user_id,
+			},
+			select: {
+				department_id: true,
+			},
+		});
+		return {
+			departments,
+			myDepartmentsIds: myDepartmentsIds.map((d) => d.department_id),
+		};
+	}
+
+	return { departments };
 };
 
 const deleteDepartment = async (department_id: string) => {
@@ -228,6 +264,101 @@ const joinDepartment = async (department_id: string, userId: string | null) => {
 	throw new AppError(status.BAD_REQUEST, "Invalid user role");
 };
 
+const getJoiningRequests = async (
+	admin: Express.User,
+	department_id: string | null,
+) => {
+	if (!department_id) {
+		throw new AppError(
+			status.BAD_REQUEST,
+			"Department id is missing in query params",
+		);
+	}
+
+	if (!admin.institution_id) {
+		throw new AppError(
+			status.BAD_REQUEST,
+			"You are not associated with any institution",
+		);
+	}
+
+	const teachers = await prisma.teacherDepartment.findMany({
+		where: {
+			department_id,
+			joining_status: "PENDING",
+			department: {
+				institution_id: admin.institution_id,
+			},
+		},
+		select: {
+			teacher: {
+				select: {
+					date_of_birth: true,
+					address: true,
+					gender: true,
+					user: {
+						select: {
+							id: true,
+							name: true,
+							role: true,
+							profile_url: true,
+						},
+					},
+				},
+			},
+		},
+	});
+
+	const students = await prisma.studentDepartment.findMany({
+		where: {
+			department_id,
+			joining_status: "PENDING",
+		},
+		select: {
+			student: {
+				select: {
+					date_of_birth: true,
+					address: true,
+					gender: true,
+					user: {
+						select: {
+							id: true,
+							name: true,
+							role: true,
+							profile_url: true,
+						},
+					},
+				},
+			},
+		},
+	});
+
+	const structuredStudents = students.map((student) => ({
+		id: student.student.user.id,
+		name: student.student.user.name,
+		role: student.student.user.role,
+		gender: student.student.gender,
+		profile_url: student.student.user.profile_url,
+		date_of_birth: student.student.date_of_birth,
+		address: student.student.address,
+	}));
+
+	const structuredTeachers = teachers.map((teacher) => ({
+		id: teacher.teacher.user.id,
+		name: teacher.teacher.user.name,
+		role: teacher.teacher.user.role,
+		gender: teacher.teacher.gender,
+		profile_url: teacher.teacher.user.profile_url,
+		date_of_birth: teacher.teacher.date_of_birth,
+		address: teacher.teacher.address,
+	}));
+
+	return {
+		students: structuredStudents,
+		teachers: structuredTeachers,
+	};
+};
+
 const approveJoining = async (
 	payload: TApproveJoiningPayload,
 	admin_user_id: string | null,
@@ -305,5 +436,6 @@ export const DepartmentService = {
 	getInstitutionDepartments,
 	deleteDepartment,
 	joinDepartment,
+	getJoiningRequests,
 	approveJoining,
 };

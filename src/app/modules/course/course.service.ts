@@ -24,17 +24,29 @@ const createCourse = async (
 		description,
 	} = payload;
 
-	const refinedDetails = removeUndefined(course_details);
+	// biome-ignore lint/suspicious/noExplicitAny: <flexibility on creating course and course details>
+	const courseData: any = {
+		code,
+		department_id,
+		learning_outcomes,
+		title,
+		description,
+	};
 
-	const {
-		batch,
-		price,
-		semester,
-		status: course_status,
-		end_date,
-		start_date,
-		currency,
-	} = refinedDetails;
+	if (course_details) {
+		const refinedDetails = removeUndefined(course_details);
+		courseData.course_details = {
+			create: {
+				batch: refinedDetails.batch,
+				semester: refinedDetails.semester,
+				end_date: refinedDetails.end_date,
+				start_date: refinedDetails.start_date,
+				status: refinedDetails.status,
+				price: refinedDetails.price,
+				currency: refinedDetails.currency,
+			},
+		};
+	}
 
 	const department = await prisma.department.findFirst({
 		where: {
@@ -53,24 +65,7 @@ const createCourse = async (
 	}
 
 	const course = await prisma.course.create({
-		data: {
-			title,
-			code,
-			department_id,
-			learning_outcomes,
-			description: description ?? null,
-			course_details: {
-				create: {
-					batch,
-					semester,
-					end_date: end_date,
-					start_date: start_date,
-					status: course_status,
-					price,
-					currency,
-				},
-			},
-		},
+		data: courseData,
 		include: {
 			course_details: true,
 			department: {
@@ -335,7 +330,7 @@ const getCourses = async (
 		throw new AppError(status.BAD_REQUEST, "Department id is not provided");
 	}
 
-	const courses = await prisma.course.findMany({
+	const coursesResponse = await prisma.course.findMany({
 		where: {
 			department: {
 				id: department_id,
@@ -359,7 +354,112 @@ const getCourses = async (
 		},
 	});
 
+	const courses = coursesResponse.map((course) => ({
+		...course,
+		course_details: course.course_details[0] ?? null,
+	}));
+
 	return courses;
+};
+
+const getAdminCourseDetails = async (
+	course_id: string | null,
+	query: IQuery,
+) => {
+	const sortOrder = query.sortOrder ? query.sortOrder : "desc";
+	const sortBy = query.sortBy ? query.sortBy : "created_at";
+
+	if (!course_id) {
+		throw new AppError(
+			status.BAD_REQUEST,
+			"Please provide the courseId in query params",
+		);
+	}
+
+	const courseDetails = await prisma.courseDetails.findMany({
+		where: {
+			course_id,
+		},
+		orderBy: {
+			[sortBy]: sortOrder,
+		},
+	});
+
+	return courseDetails;
+};
+
+const getCourseDetails = async (course_id: string | null) => {
+	if (!course_id) {
+		throw new AppError(
+			status.BAD_REQUEST,
+			"Please provide courseId in query params",
+		);
+	}
+
+	const response = await prisma.courseDetails.findFirst({
+		where: {
+			course_id,
+			status: "ONGOING",
+		},
+		include: {
+			teachers: {
+				select: {
+					teacher: {
+						select: {
+							degree: true,
+							specialization: true,
+							certificate_url: true,
+							user: {
+								select: {
+									name: true,
+									profile_url: true,
+								},
+							},
+						},
+					},
+				},
+			},
+			course: {
+				select: {
+					department: {
+						select: {
+							name: true,
+							department_description: true,
+							department_established_year: true,
+							code: true,
+						},
+					},
+				},
+			},
+		},
+		omit: {
+			created_at: true,
+			updated_at: true,
+		},
+	});
+
+	const { teachers, course, ...rest } = response || {};
+
+	const structuredTeachers = teachers?.map((t) => ({
+		name: t.teacher.user.name,
+		profile_url: t.teacher.user.profile_url,
+		degree: t.teacher.degree,
+		certificate_url: t.teacher.certificate_url,
+		specialization: t.teacher.specialization,
+	}));
+
+	const department = {
+		name: course?.department.name,
+		department_description: course?.department.department_description,
+		department_established_year: course?.department.department_established_year,
+		code: course?.department.code,
+	};
+
+	return {
+		teachers: structuredTeachers,
+		department,
+		...rest,
+	};
 };
 
 export const CourseService = {
@@ -369,4 +469,6 @@ export const CourseService = {
 	updateCourseStatus,
 	assignCourseTeacher,
 	getCourses,
+	getAdminCourseDetails,
+	getCourseDetails,
 };

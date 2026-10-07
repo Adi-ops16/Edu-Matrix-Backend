@@ -74,6 +74,27 @@ const getCourses = catchAsync(async (req, res) => {
 	});
 });
 
+const getAdminCourseDetails = catchAsync(async (req, res) => {
+	const course_id = req.params.courseId as string | null;
+	const query = req.query;
+	const result = await CourseService.getAdminCourseDetails(course_id, query);
+
+	sendResponse(res, {
+		message: "Course details retrieved",
+		data: result,
+	});
+});
+
+const getCourseDetails = catchAsync(async (req, res) => {
+	const course_id = req.params.courseId as string | null;
+	const result = await CourseService.getCourseDetails(course_id);
+
+	sendResponse(res, {
+		message: "Course details retrieved",
+		data: result,
+	});
+});
+
 export const CourseController = {
 	createCourse,
 	updateCourseDetails,
@@ -81,4 +102,6 @@ export const CourseController = {
 	updateCourseStatus,
 	assignCourseTeacher,
 	getCourses,
+	getAdminCourseDetails,
+	getCourseDetails,
 };

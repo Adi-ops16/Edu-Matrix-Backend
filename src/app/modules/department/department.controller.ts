@@ -29,9 +29,14 @@ const updatedDepartment = catchAsync(async (req, res) => {
 
 const getInstitutionDepartments = catchAsync(async (req, res) => {
 	const institution_id = req.user?.institution_id ?? null;
+	const user_id = req.user?.id as string;
+	const role = req.user?.role ?? null;
 
-	const result =
-		await DepartmentService.getInstitutionDepartments(institution_id);
+	const result = await DepartmentService.getInstitutionDepartments(
+		institution_id,
+		user_id,
+		role,
+	);
 
 	sendResponse(res, {
 		message: "Departments fetched successfully",
@@ -45,6 +50,21 @@ const deleteDepartment = catchAsync(async (req, res) => {
 
 	sendResponse(res, {
 		message: "Department deleted",
+	});
+});
+
+const getJoiningRequests = catchAsync(async (req, res) => {
+	const department_id = req.params.department_id as string | null;
+	const admin = req.user as Express.User;
+
+	const result = await DepartmentService.getJoiningRequests(
+		admin,
+		department_id,
+	);
+
+	sendResponse(res, {
+		message: `Requests fetched successful`,
+		data: result,
 	});
 });
 
@@ -77,6 +97,7 @@ export const DepartmentController = {
 	updatedDepartment,
 	getInstitutionDepartments,
 	deleteDepartment,
+	getJoiningRequests,
 	joinDepartment,
 	approveJoining,
 };

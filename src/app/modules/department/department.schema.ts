@@ -30,7 +30,9 @@ export const deleteDepartmentSchema = z.object({
 	department_id: z.uuid("Invalid uuid"),
 });
 
-export const joinDepartmentSchema = deleteDepartmentSchema;
+export const joinDepartmentSchema = z.object({
+	department_id: z.uuid("Invalid uuid"),
+});
 
 export const approveJoiningSchema = z.object({
 	department_id: z.uuid("Invalid uuid"),

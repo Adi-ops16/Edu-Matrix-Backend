@@ -38,5 +38,6 @@ model CourseDetails {
     created_at DateTime @default(now())
     updated_at DateTime @updatedAt
 
+    @@unique([course_id], where: { status: "ONGOING" }, map: "unique_ongoing_batch_per_course")
     @@map("course_details")
 }

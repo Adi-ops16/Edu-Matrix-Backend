@@ -39,6 +39,12 @@ router.delete(
 	DepartmentController.deleteDepartment,
 );
 
+router.get(
+	"/requests/:department_id",
+	auth("INSTITUTION_ADMIN"),
+	DepartmentController.getJoiningRequests,
+);
+
 router.post(
 	"/join",
 	auth("STUDENT", "TEACHER"),

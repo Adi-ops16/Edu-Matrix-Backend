@@ -42,7 +42,7 @@ export const createCourseSchema = z.object({
 
 	department_id: z.uuid("Invalid department ID"),
 
-	course_details: courseDetailsSchema,
+	course_details: courseDetailsSchema.optional(),
 });
 
 export const updateCourseDetailsSchema = z.object({

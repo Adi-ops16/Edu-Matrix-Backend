@@ -33,7 +33,7 @@ export interface IQuery {
 	searchTerm?: string;
 	page?: string;
 	limit?: string;
-	sortOrder?: string;
+	sortOrder?: "asc" | "desc";
 	sortBy?: string;
 
 	// biome-ignore lint/suspicious/noExplicitAny: <flexible query params>
