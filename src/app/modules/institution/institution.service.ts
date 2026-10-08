@@ -1,14 +1,10 @@
 import path from "node:path";
 import ejs from "ejs";
 import status from "http-status";
-import type {
-	StudentWhereInput,
-	UserWhereInput,
-} from "../../../../generated/prisma/models";
 import config from "../../config";
 import transporter from "../../lib/nodeMailer";
 import { prisma } from "../../lib/prisma";
-import type { IQuery, RequestUser } from "../../types";
+import type { RequestUser } from "../../types";
 import AppError from "../../utils/appError";
 import type {
 	TApplyForInstitutionPayload,
@@ -54,163 +50,6 @@ const getInstitutionApplications = async () => {
 	});
 
 	return applications;
-};
-
-const getInstitutionTeachers = async (admin: Express.User, query: IQuery) => {
-	let limit = 10;
-	if (query.limit) {
-		limit = Number(query.limit);
-	}
-
-	let page = 1;
-	if (query.page) {
-		page = Number(query.page);
-	}
-	const skip = (page - 1) * limit;
-
-	const andConditions: UserWhereInput[] = [
-		{
-			institution_id: admin.institution_id,
-			is_deleted: false,
-			is_verified: true,
-			is_active: true,
-			member_status: "APPROVED",
-			role: "TEACHER",
-		},
-	];
-
-	if (query.name) {
-		andConditions.push({
-			name: {
-				contains: query.name,
-				mode: "insensitive",
-			},
-		});
-	}
-
-	if (query.email) {
-		andConditions.push({
-			email: {
-				contains: query.email,
-				mode: "insensitive",
-			},
-		});
-	}
-
-	const teachers = await prisma.user.findMany({
-		where: {
-			AND: andConditions,
-		},
-		select: {
-			name: true,
-			profile_url: true,
-			email: true,
-			teacher: {
-				omit: {
-					certificate_public_id: true,
-					created_at: true,
-					updated_at: true,
-				},
-			},
-		},
-		skip,
-		take: limit,
-	});
-	const total = teachers.length;
-
-	const meta = {
-		page,
-		limit,
-		dataCount: total,
-		totalPages: Math.ceil(total / limit) || 1,
-	};
-
-	return {
-		meta,
-		data: teachers,
-	};
-};
-
-const getInstitutionStudents = async (admin: Express.User, query: IQuery) => {
-	let limit = 10;
-	if (query.limit) {
-		limit = Number(query.limit);
-	}
-
-	let page = 1;
-	if (query.page) {
-		page = Number(query.page);
-	}
-	const skip = (page - 1) * limit;
-
-	const andConditions: StudentWhereInput[] = [];
-
-	if (query.name) {
-		andConditions.push({
-			user: {
-				name: {
-					contains: query.name,
-					mode: "insensitive",
-				},
-			},
-		});
-	}
-
-	if (query.email) {
-		andConditions.push({
-			user: {
-				email: {
-					contains: query.email,
-					mode: "insensitive",
-				},
-			},
-		});
-	}
-
-	const where: StudentWhereInput = {
-		AND: andConditions,
-		user: {
-			institution_id: admin.institution_id,
-			is_deleted: false,
-			is_verified: true,
-			is_active: true,
-			member_status: "APPROVED",
-			role: "STUDENT",
-		},
-	};
-
-	const students = await prisma.student.findMany({
-		where,
-		omit: {
-			created_at: true,
-			updated_at: true,
-			certificate_public_id: true,
-		},
-		skip,
-		take: limit,
-		include: {
-			user: {
-				select: {
-					name: true,
-					profile_url: true,
-					email: true,
-				},
-			},
-		},
-	});
-	const total = await prisma.student.count({ where });
-
-	const meta = {
-		page,
-		limit,
-		dataCount: total,
-		totalPages: Math.ceil(total / limit) || 1,
-	};
-
-	return {
-		meta,
-		data: students,
-	};
 };
 
 const updateInstitutionStatus = async (
@@ -419,8 +258,6 @@ export const InstitutionService = {
 	createInstitution,
 	getInstitutions,
 	getInstitutionApplications,
-	getInstitutionTeachers,
-	getInstitutionStudents,
 	updateInstitutionStatus,
 	applyForInstitution,
 	getPendingApplications,

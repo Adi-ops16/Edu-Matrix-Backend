@@ -18,9 +18,15 @@ router.patch(
 );
 
 router.get(
-	"/",
+	"/teachers",
 	auth("INSTITUTION_ADMIN"),
 	TeacherController.getInstitutionTeachers,
+);
+
+router.get(
+	"/assign/:courseDetailsId",
+	auth("INSTITUTION_ADMIN"),
+	TeacherController.getTeachersToAssignToCourse,
 );
 
 export const TeacherRoutes = router;

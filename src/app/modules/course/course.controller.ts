@@ -95,6 +95,16 @@ const getCourseDetails = catchAsync(async (req, res) => {
 	});
 });
 
+const getMyCourses = catchAsync(async (req, res) => {
+	const user = req.user as Express.User;
+	const result = await CourseService.getMyCourses(user);
+
+	sendResponse(res, {
+		message: "User Courses retrieved",
+		data: result,
+	});
+});
+
 export const CourseController = {
 	createCourse,
 	updateCourseDetails,
@@ -104,4 +114,5 @@ export const CourseController = {
 	getCourses,
 	getAdminCourseDetails,
 	getCourseDetails,
+	getMyCourses,
 };

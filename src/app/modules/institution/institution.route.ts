@@ -21,18 +21,6 @@ router.post(
 router.get("/institutions", auth(), InstitutionController.getInstitutions);
 
 router.get(
-	"/teachers",
-	auth("INSTITUTION_ADMIN"),
-	InstitutionController.getInstitutionTeachers,
-);
-
-router.get(
-	"/students",
-	auth("INSTITUTION_ADMIN"),
-	InstitutionController.getInstitutionStudents,
-);
-
-router.get(
 	"/institution-applications",
 	auth("SUPER_ADMIN"),
 	InstitutionController.getInstitutionApplications,

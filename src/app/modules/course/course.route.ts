@@ -30,6 +30,12 @@ router.get(
 	CourseController.getCourseDetails,
 );
 
+router.get(
+	"/my-courses",
+	auth("STUDENT", "TEACHER"),
+	CourseController.getMyCourses,
+);
+
 router.post(
 	"/create",
 	auth("INSTITUTION_ADMIN"),

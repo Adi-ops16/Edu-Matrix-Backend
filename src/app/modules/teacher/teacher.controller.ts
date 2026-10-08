@@ -16,11 +16,30 @@ const updateTeacherProfile = catchAsync(async (req, res) => {
 
 const getInstitutionTeachers = catchAsync(async (req, res) => {
 	const admin = req.user as Express.User;
+	const query = req.query;
 
-	const result = await TeacherService.getInstitutionTeachers(admin);
+	const { data, meta } = await TeacherService.getInstitutionTeachers(
+		admin,
+		query,
+	);
 
 	sendResponse(res, {
-		message: "Teacher profile retrieved",
+		message: "Teachers retrieved",
+		data,
+		meta,
+	});
+});
+
+const getTeachersToAssignToCourse = catchAsync(async (req, res) => {
+	const courseDetailsId = Number(req.params.courseDetailsId) as number | null;
+	const query = req.query;
+	const result = await TeacherService.getTeachersToAssignToCourse(
+		courseDetailsId,
+		query,
+	);
+
+	sendResponse(res, {
+		message: "Teachers retrieved to assign to course",
 		data: result,
 	});
 });
@@ -28,4 +47,5 @@ const getInstitutionTeachers = catchAsync(async (req, res) => {
 export const TeacherController = {
 	updateTeacherProfile,
 	getInstitutionTeachers,
+	getTeachersToAssignToCourse,
 };

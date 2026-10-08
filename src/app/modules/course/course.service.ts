@@ -1,4 +1,5 @@
 import status from "http-status";
+import type { CourseStatus } from "../../../../generated/prisma/enums";
 import { prisma } from "../../lib/prisma";
 import type { IQuery } from "../../types";
 import AppError from "../../utils/appError";
@@ -151,11 +152,26 @@ const updateCourseDetails = async (
 		select: {
 			id: true,
 			course_id: true,
+			status: true,
 		},
 	});
 
 	if (!courseDetails) {
 		throw new AppError(status.NOT_FOUND, "Course details not found");
+	}
+
+	if (courseDetails.status === "ONGOING") {
+		throw new AppError(
+			status.BAD_REQUEST,
+			"You cannot update an ongoing course offering",
+		);
+	}
+
+	if (courseDetails.status === "COMPLETED") {
+		throw new AppError(
+			status.BAD_REQUEST,
+			"You cannot update a completed course offering",
+		);
 	}
 
 	const { course_details_id, ...refinedPayload } = removeUndefined(payload);
@@ -421,6 +437,10 @@ const getCourseDetails = async (course_id: string | null) => {
 			},
 			course: {
 				select: {
+					title: true,
+					code: true,
+					description: true,
+					learning_outcomes: true,
 					department: {
 						select: {
 							name: true,
@@ -439,6 +459,7 @@ const getCourseDetails = async (course_id: string | null) => {
 	});
 
 	const { teachers, course, ...rest } = response || {};
+	const { department, ...courseInfo } = course || {};
 
 	const structuredTeachers = teachers?.map((t) => ({
 		name: t.teacher.user.name,
@@ -448,7 +469,7 @@ const getCourseDetails = async (course_id: string | null) => {
 		specialization: t.teacher.specialization,
 	}));
 
-	const department = {
+	const departmentData = {
 		name: course?.department.name,
 		department_description: course?.department.department_description,
 		department_established_year: course?.department.department_established_year,
@@ -457,9 +478,96 @@ const getCourseDetails = async (course_id: string | null) => {
 
 	return {
 		teachers: structuredTeachers,
-		department,
+		department: departmentData,
 		...rest,
+		...courseInfo,
 	};
+};
+
+const getMyCourses = async (user: Express.User) => {
+	const isStudent = user.role === "STUDENT";
+	const select = {
+		course_details: {
+			select: {
+				status: true,
+				end_date: true,
+				start_date: true,
+				semester: true,
+				course: {
+					select: {
+						title: true,
+						code: true,
+						description: true,
+						learning_outcomes: true,
+						department: {
+							select: {
+								name: true,
+								department_description: true,
+								department_established_year: true,
+								code: true,
+							},
+						},
+					},
+				},
+			},
+		},
+	};
+	type Result = {
+		course_details: {
+			semester: string;
+			start_date: Date | null;
+			end_date: Date | null;
+			status: CourseStatus;
+			course: {
+				title: string;
+				code: string;
+				description: string | null;
+				learning_outcomes: string[];
+				department: {
+					code: string;
+					name: string;
+					department_description: string | null;
+					department_established_year: number | null;
+				};
+			};
+		};
+	};
+	const structuredResult = (result: Result[]) => {
+		const structuredResult = result.map(({ course_details }) => {
+			const { course, semester, start_date, end_date, status } = course_details;
+			const { department, ...courseInfo } = course;
+
+			return {
+				department,
+				course: courseInfo,
+				semester,
+				start_date,
+				end_date,
+				status,
+			};
+		});
+		return structuredResult;
+	};
+
+	if (isStudent) {
+		const result = await prisma.studentEnrollment.findMany({
+			where: {
+				student_id: user.id,
+			},
+			select,
+		});
+
+		return structuredResult(result);
+	} else {
+		const result = await prisma.courseTeacher.findMany({
+			where: {
+				teacher_id: user.id,
+			},
+			select,
+		});
+
+		return structuredResult(result);
+	}
 };
 
 export const CourseService = {
@@ -471,4 +579,5 @@ export const CourseService = {
 	getCourses,
 	getAdminCourseDetails,
 	getCourseDetails,
+	getMyCourses,
 };

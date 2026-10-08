@@ -14,6 +14,19 @@ const updateStudentProfile = catchAsync(async (req, res) => {
 	});
 });
 
+const getInstitutionStudents = catchAsync(async (req, res) => {
+	const admin = req.user as Express.User;
+	const query = req.query;
+	const result = await StudentService.getInstitutionStudents(admin, query);
+
+	sendResponse(res, {
+		message: "Institution Students fetched successfully",
+		data: result.data,
+		meta: result.meta,
+	});
+});
+
 export const StudentController = {
 	updateStudentProfile,
+	getInstitutionStudents,
 };

@@ -33,30 +33,6 @@ const getInstitutionApplications = catchAsync(async (_req, res) => {
 	});
 });
 
-const getInstitutionTeachers = catchAsync(async (req, res) => {
-	const admin = req.user as Express.User;
-	const query = req.query;
-	const result = await InstitutionService.getInstitutionTeachers(admin, query);
-
-	sendResponse(res, {
-		message: "Institution Teachers fetched successfully",
-		data: result.data,
-		meta: result.meta,
-	});
-});
-
-const getInstitutionStudents = catchAsync(async (req, res) => {
-	const admin = req.user as Express.User;
-	const query = req.query;
-	const result = await InstitutionService.getInstitutionStudents(admin, query);
-
-	sendResponse(res, {
-		message: "Institution Students fetched successfully",
-		data: result.data,
-		meta: result.meta,
-	});
-});
-
 const updateInstitutionStatus = catchAsync(async (req, res) => {
 	const payload = req.body;
 	const user = req.user as RequestUser;
@@ -109,8 +85,6 @@ export const InstitutionController = {
 	createInstitution,
 	getInstitutions,
 	getInstitutionApplications,
-	getInstitutionStudents,
-	getInstitutionTeachers,
 	updateInstitutionStatus,
 	applyForInstitution,
 	getPendingApplications,

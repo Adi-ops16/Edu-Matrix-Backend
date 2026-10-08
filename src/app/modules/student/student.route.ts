@@ -13,4 +13,10 @@ router.patch(
 	StudentController.updateStudentProfile,
 );
 
+router.get(
+	"/students",
+	auth("INSTITUTION_ADMIN"),
+	StudentController.getInstitutionStudents,
+);
+
 export const StudentRoutes = router;

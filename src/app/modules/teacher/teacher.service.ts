@@ -1,5 +1,10 @@
 import status from "http-status";
+import type {
+	TeacherWhereInput,
+	UserWhereInput,
+} from "../../../../generated/prisma/models";
 import { prisma } from "../../lib/prisma";
+import type { IQuery } from "../../types";
 import AppError from "../../utils/appError";
 import { removeUndefined } from "../../utils/removeUndefined";
 import uploadImage from "../../utils/uploadImage";
@@ -30,37 +35,154 @@ const updateTeacherProfile = async (
 	return updatedTeacher;
 };
 
-const getInstitutionTeachers = async (admin: Express.User) => {
-	if (!admin.institution_id) {
+const getInstitutionTeachers = async (admin: Express.User, query: IQuery) => {
+	let limit = 10;
+	if (query.limit) {
+		limit = Number(query.limit);
+	}
+
+	let page = 1;
+	if (query.page) {
+		page = Number(query.page);
+	}
+	const skip = (page - 1) * limit;
+
+	const andConditions: UserWhereInput[] = [
+		{
+			institution_id: admin.institution_id,
+			is_deleted: false,
+			is_verified: true,
+			is_active: true,
+			member_status: "APPROVED",
+			role: "TEACHER",
+		},
+	];
+
+	if (query.name) {
+		andConditions.push({
+			name: {
+				contains: query.name,
+				mode: "insensitive",
+			},
+		});
+	}
+
+	if (query.email) {
+		andConditions.push({
+			email: {
+				contains: query.email,
+				mode: "insensitive",
+			},
+		});
+	}
+
+	const teachers = await prisma.user.findMany({
+		where: {
+			AND: andConditions,
+		},
+		select: {
+			name: true,
+			profile_url: true,
+			email: true,
+			teacher: {
+				omit: {
+					certificate_public_id: true,
+					created_at: true,
+					updated_at: true,
+				},
+			},
+		},
+		skip,
+		take: limit,
+	});
+	const total = teachers.length;
+
+	const meta = {
+		page,
+		limit,
+		dataCount: total,
+		totalPages: Math.ceil(total / limit) || 1,
+	};
+
+	return {
+		meta,
+		data: teachers,
+	};
+};
+
+const getTeachersToAssignToCourse = async (
+	courseDetailsId: number | null,
+	query: IQuery,
+) => {
+	if (!courseDetailsId) {
 		throw new AppError(
 			status.BAD_REQUEST,
-			"Admin doesn't belong to any institution",
+			"Provide the course details id in query params",
 		);
 	}
 
-	const teacher = await prisma.teacher.findMany({
-		where: {
+	const orConditions: TeacherWhereInput[] = [];
+
+	if (query.searchTerm) {
+		orConditions.push({
 			user: {
-				institution_id: admin.institution_id,
-				is_active: true,
-				is_deleted: false,
-				user_status: "ACTIVE",
-				member_status: "APPROVED",
-				is_verified: true,
+				name: {
+					contains: query.searchTerm,
+					mode: "insensitive",
+				},
 			},
+		});
+	}
+	if (query.searchTerm) {
+		orConditions.push({
+			user: {
+				email: {
+					contains: query.searchTerm,
+					mode: "insensitive",
+				},
+			},
+		});
+	}
+
+	const teachers = await prisma.teacher.findMany({
+		where: {
+			courses: {
+				none: {
+					course_details_id: courseDetailsId,
+				},
+			},
+			...(orConditions.length > 0 ? { OR: orConditions } : {}),
 		},
-		include: {
+		select: {
+			degree: true,
+			designation: true,
+			specialization: true,
+			teacher_id: true,
 			user: {
 				select: {
 					name: true,
-					email: true,
 					profile_url: true,
+					email: true,
 				},
 			},
 		},
 	});
 
-	return teacher;
+	const structuredResult = teachers.map((t) => ({
+		teacher_id: t.teacher_id,
+		name: t.user.name,
+		email: t.user.email,
+		profile_url: t.user.profile_url,
+		degree: t.degree,
+		designation: t.designation,
+		specialization: t.specialization,
+	}));
+
+	return structuredResult;
 };
 
-export const TeacherService = { updateTeacherProfile, getInstitutionTeachers };
+export const TeacherService = {
+	updateTeacherProfile,
+	getInstitutionTeachers,
+	getTeachersToAssignToCourse,
+};
