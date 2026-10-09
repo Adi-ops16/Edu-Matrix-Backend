@@ -62,15 +62,15 @@ const googleCallback = (req: Request, res: Response, next: NextFunction) => {
 
 				res.cookie("access_token", access_token, {
 					httpOnly: true,
-					sameSite: "lax",
-					secure: config.environment === "production",
+					secure: config.environment !== "development",
+					sameSite: config.environment === "development" ? "lax" : "none",
 					maxAge: 24 * 60 * 60 * 1000,
 				});
 
 				res.cookie("refresh_token", refresh_token, {
 					httpOnly: true,
-					sameSite: "lax",
-					secure: config.environment === "production",
+					secure: config.environment !== "development",
+					sameSite: config.environment === "development" ? "lax" : "none",
 					maxAge: 7 * 24 * 60 * 60 * 1000,
 				});
 

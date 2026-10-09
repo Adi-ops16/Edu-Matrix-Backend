@@ -2,7 +2,7 @@ import path from "node:path";
 import ejs from "ejs";
 import status from "http-status";
 import config from "../../config";
-import transporter from "../../lib/nodeMailer";
+import transporter, { brandLogoAttachment } from "../../lib/nodeMailer";
 import { prisma } from "../../lib/prisma";
 import type { RequestUser } from "../../types";
 import AppError from "../../utils/appError";
@@ -249,6 +249,7 @@ const reviewApplication = async (
 		to: updatedUser.email,
 		subject: "Application reviewed",
 		html,
+		attachments: [brandLogoAttachment],
 	});
 
 	return updatedUser;

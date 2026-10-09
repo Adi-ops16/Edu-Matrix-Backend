@@ -37,6 +37,7 @@ const getMyPayments = catchAsync(async (req, res) => {
 		data: result,
 	});
 });
+
 export const PaymentController = {
 	getMyPayments,
 	createCoursePayment,

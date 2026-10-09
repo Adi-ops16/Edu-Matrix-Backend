@@ -63,7 +63,7 @@ const createCoursePayment = async (
 	if (studentDepartment.joining_status !== "APPROVED") {
 		throw new AppError(
 			status.BAD_REQUEST,
-			"Student is not eligible to get this course",
+			"You are not approved to this department yet, contact your institution admin",
 		);
 	}
 
@@ -103,8 +103,8 @@ const createCoursePayment = async (
 			institution_id: student.institution_id,
 			course_details_id: courseDetails.id,
 		},
-		success_url: `${config.frontend_url}/payment/success?session_id={CHECKOUT_SESSION_ID}`,
-		cancel_url: `${config.frontend_url}/payment/cancel`,
+		success_url: `${config.frontend_url}/student/payment/success`,
+		cancel_url: `${config.frontend_url}/student/payment/cancel`,
 	});
 
 	return session.url;
@@ -153,13 +153,45 @@ const getMyPayments = async (
 	const payments = await prisma.payment.findMany({
 		where: {
 			student_id,
+			status: { in: ["SUCCESS", "REFUNDED"] },
+		},
+		include: {
+			course_details: {
+				select: {
+					batch: true,
+					semester: true,
+					start_date: true,
+					end_date: true,
+					course: {
+						select: {
+							title: true,
+						},
+					},
+				},
+			},
 		},
 		omit: {
 			gateway_response: true,
 		},
+		orderBy: { created_at: "desc" },
 	});
 
-	return payments;
+	const structuredResult = payments.map((p) => {
+		const { course_details, ...rest } = p;
+		const result = {
+			course: {
+				title: course_details.course.title,
+				batch: course_details.batch,
+				semester: course_details.semester,
+				start_date: course_details.start_date,
+				end_date: course_details.end_date,
+			},
+			...rest,
+		};
+		return result;
+	});
+
+	return structuredResult;
 };
 
 export const PaymentService = {

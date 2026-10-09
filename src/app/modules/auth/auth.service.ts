@@ -3,7 +3,7 @@ import path from "node:path";
 import ejs from "ejs";
 import status from "http-status";
 import config from "../../config";
-import transporter from "../../lib/nodeMailer";
+import transporter, { brandLogoAttachment } from "../../lib/nodeMailer";
 import { prisma } from "../../lib/prisma";
 import redisClient from "../../lib/redis";
 import type { IJwtPayload } from "../../types";
@@ -85,11 +85,12 @@ const registerUser = async (payload: TRegisterPayload) => {
 	};
 	const html = await ejs.renderFile(filePath, htmlData);
 
-	transporter.sendMail({
+	await transporter.sendMail({
 		from: config.email_sender,
 		to: email,
 		subject: "Your registration otp for Edu-Matrix",
 		html,
+		attachments: [brandLogoAttachment],
 	});
 };
 
