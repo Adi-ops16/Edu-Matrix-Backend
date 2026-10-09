@@ -19,4 +19,10 @@ router.get(
 	StudentController.getInstitutionStudents,
 );
 
+router.get(
+	"/department/:department_id",
+	auth("INSTITUTION_ADMIN"),
+	StudentController.getDepartmentStudents,
+);
+
 export const StudentRoutes = router;

@@ -11,7 +11,7 @@ dotenv.config({ path: envPath, quiet: true });
 export default {
 	environment: env.ENVIRONMENT,
 	port: env.PORT,
-	frontend_url: env.FRONTEND_URL,
+	frontend_url: env.FRONTEND_URL || "http://localhost:3000",
 	database_url: env.DATABASE_URL!,
 	bcrypt_salt_rounds: env.BCRYPT_SALT_ROUNDS!,
 
@@ -38,6 +38,7 @@ export default {
 	google_client_cb_url: env.GOOGLE_CLIENT_CB_URL!,
 	google_client_secret: env.GOOGLE_CLIENT_SECRET!,
 	google_refresh_token: env.GOOGLE_REFRESH_TOKEN!,
+	google_app_password: env.GOOGLE_APP_PASSWORD!,
 
 	// super admin credentials
 	super_admin_name: env.SUPER_ADMIN_NAME!,

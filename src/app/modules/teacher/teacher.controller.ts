@@ -30,6 +30,24 @@ const getInstitutionTeachers = catchAsync(async (req, res) => {
 	});
 });
 
+const getDepartmentTeachers = catchAsync(async (req, res) => {
+	const admin = req.user as Express.User;
+	const query = req.query;
+	const department_id = req.params.department_id as string | null;
+
+	const { data, meta } = await TeacherService.getDepartmentTeachers(
+		admin,
+		department_id,
+		query,
+	);
+
+	sendResponse(res, {
+		message: "Department Teachers retrieved",
+		data,
+		meta,
+	});
+});
+
 const getTeachersToAssignToCourse = catchAsync(async (req, res) => {
 	const courseDetailsId = Number(req.params.courseDetailsId) as number | null;
 	const query = req.query;
@@ -47,5 +65,6 @@ const getTeachersToAssignToCourse = catchAsync(async (req, res) => {
 export const TeacherController = {
 	updateTeacherProfile,
 	getInstitutionTeachers,
+	getDepartmentTeachers,
 	getTeachersToAssignToCourse,
 };

@@ -1,5 +1,6 @@
 import status from "http-status";
 import type {
+	TeacherDepartmentWhereInput,
 	TeacherWhereInput,
 	UserWhereInput,
 } from "../../../../generated/prisma/models";
@@ -110,6 +111,119 @@ const getInstitutionTeachers = async (admin: Express.User, query: IQuery) => {
 	};
 };
 
+const getDepartmentTeachers = async (
+	admin: Express.User,
+	department_id: string | null,
+	query: IQuery,
+) => {
+	if (!department_id) {
+		throw new AppError(
+			status.BAD_REQUEST,
+			"department_id missing from query params",
+		);
+	}
+	let limit = 10;
+	if (query.limit) {
+		limit = Number(query.limit);
+	}
+
+	let page = 1;
+	if (query.page) {
+		page = Number(query.page);
+	}
+	const skip = (page - 1) * limit;
+
+	const orConditions: TeacherDepartmentWhereInput[] = [];
+
+	if (query.searchTerm) {
+		orConditions.push({
+			teacher: {
+				user: {
+					name: { contains: query.searchTerm, mode: "insensitive" },
+				},
+			},
+		});
+	}
+
+	if (query.searchTerm) {
+		orConditions.push({
+			teacher: {
+				user: {
+					email: { contains: query.searchTerm, mode: "insensitive" },
+				},
+			},
+		});
+	}
+
+	const andConditions: TeacherDepartmentWhereInput[] = [
+		{
+			department_id,
+			joining_status: "APPROVED",
+			teacher: {
+				user: {
+					institution_id: admin.institution_id,
+					is_deleted: false,
+					is_verified: true,
+					is_active: true,
+					member_status: "APPROVED",
+				},
+			},
+		},
+		{
+			OR: orConditions,
+		},
+	];
+
+	const teachers = await prisma.teacherDepartment.findMany({
+		where: {
+			AND: andConditions,
+		},
+		select: {
+			teacher: {
+				include: {
+					user: {
+						select: {
+							name: true,
+							email: true,
+							profile_url: true,
+						},
+					},
+				},
+				omit: {
+					certificate_public_id: true,
+					created_at: true,
+					updated_at: true,
+				},
+			},
+		},
+		skip,
+		take: limit,
+	});
+
+	const structuredResults = teachers.map(({ teacher }) => {
+		const { user, ...rest } = teacher;
+		return {
+			...user,
+			teacher: {
+				...rest,
+			},
+		};
+	});
+	const total = structuredResults.length;
+
+	const meta = {
+		page,
+		limit,
+		dataCount: total,
+		totalPages: Math.ceil(total / limit) || 1,
+	};
+
+	return {
+		meta,
+		data: structuredResults,
+	};
+};
+
 const getTeachersToAssignToCourse = async (
 	courseDetailsId: number | null,
 	query: IQuery,
@@ -185,4 +299,5 @@ export const TeacherService = {
 	updateTeacherProfile,
 	getInstitutionTeachers,
 	getTeachersToAssignToCourse,
+	getDepartmentTeachers,
 };

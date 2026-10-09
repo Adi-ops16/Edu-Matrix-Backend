@@ -24,6 +24,12 @@ router.get(
 );
 
 router.get(
+	"/department/:department_id",
+	auth("INSTITUTION_ADMIN"),
+	TeacherController.getDepartmentTeachers,
+);
+
+router.get(
 	"/assign/:courseDetailsId",
 	auth("INSTITUTION_ADMIN"),
 	TeacherController.getTeachersToAssignToCourse,

@@ -26,7 +26,25 @@ const getInstitutionStudents = catchAsync(async (req, res) => {
 	});
 });
 
+const getDepartmentStudents = catchAsync(async (req, res) => {
+	const admin = req.user as Express.User;
+	const query = req.query;
+	const department_id = req.params.department_id as string | null;
+	const { data, meta } = await StudentService.getDepartmentStudents(
+		admin,
+		department_id,
+		query,
+	);
+
+	sendResponse(res, {
+		message: "Department Students fetched",
+		data,
+		meta,
+	});
+});
+
 export const StudentController = {
 	updateStudentProfile,
 	getInstitutionStudents,
+	getDepartmentStudents,
 };
