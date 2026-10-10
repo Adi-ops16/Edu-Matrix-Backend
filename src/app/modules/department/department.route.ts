@@ -45,12 +45,6 @@ router.get(
 	DepartmentController.getJoiningRequests,
 );
 
-router.get(
-	"/members/:department_id",
-	auth("INSTITUTION_ADMIN"),
-	DepartmentController.getDepartmentMembers,
-);
-
 router.post(
 	"/join",
 	auth("STUDENT", "TEACHER"),

@@ -260,6 +260,14 @@ const getTeachersToAssignToCourse = async (
 
 	const teachers = await prisma.teacher.findMany({
 		where: {
+			user: {
+				member_status: "APPROVED",
+			},
+			departments: {
+				some: {
+					joining_status: "APPROVED",
+				},
+			},
 			courses: {
 				none: {
 					course_details_id: courseDetailsId,

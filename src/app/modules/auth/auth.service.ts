@@ -47,6 +47,11 @@ const registerUser = async (payload: TRegisterPayload) => {
 
 	// OTP set to redis
 	const otpValue = crypto.randomInt(100000, 1000000).toString();
+
+	if (config.environment === "development") {
+		console.log(`[DEV]: User registration otp log -> ${otpValue}`);
+	}
+
 	const redisOtpKey = `verify-email-otp:${email}`;
 
 	await redisClient.set(redisOtpKey, otpValue, {

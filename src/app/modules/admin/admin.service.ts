@@ -25,8 +25,8 @@ const getPlatformOverview = async () => {
 		prisma.institution.count({ where: { status: "PENDING" } }),
 
 		// User Profile Metrics
-		prisma.student.count(),
-		prisma.teacher.count(),
+		prisma.student.count({ where: { user: { member_status: "APPROVED" } } }),
+		prisma.teacher.count({ where: { user: { member_status: "APPROVED" } } }),
 
 		// Academic Structure Metrics
 		prisma.department.count(),
@@ -86,6 +86,5 @@ const getPlatformOverview = async () => {
 		generatedAt: new Date().toISOString(),
 	};
 };
-
 
 export const AdminService = { getPlatformOverview };

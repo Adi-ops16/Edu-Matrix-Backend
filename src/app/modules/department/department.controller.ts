@@ -68,23 +68,6 @@ const getJoiningRequests = catchAsync(async (req, res) => {
 	});
 });
 
-const getDepartmentMembers = catchAsync(async (req, res) => {
-	const department_id = req.params.department_id as string | null;
-	const admin = req.user as Express.User;
-	const query = req.query;
-
-	const data = await DepartmentService.getDepartmentMembers(
-		admin,
-		department_id,
-		query,
-	);
-
-	sendResponse(res, {
-		message: "Department members retrieved",
-		data,
-	});
-});
-
 const joinDepartment = catchAsync(async (req, res) => {
 	const department_id: string = req.body.department_id;
 	const userId = req.user?.id ?? null;
@@ -115,7 +98,6 @@ export const DepartmentController = {
 	getInstitutionDepartments,
 	deleteDepartment,
 	getJoiningRequests,
-	getDepartmentMembers,
 	joinDepartment,
 	approveJoining,
 };
